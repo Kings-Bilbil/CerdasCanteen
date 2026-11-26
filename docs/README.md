@@ -20,6 +20,8 @@ Dokumentasi) sesuai `Tugas.md`.
 | `nilai_bisnis_tugas14.md` | Manfaat QR struk & estimasi antrean bagi mahasiswa & kantin, model keberlanjutan | Tugas 14 |
 | `bug_log.md` | 8 bug dengan gejala → penyebab → solusi | Tugas 13 |
 | `laporan_pengujian.md` | Rangkuman test, daftar test per file, batas cakupan automated test | Tugas 13/14 |
+| `panduan_testing.md` | **Cara membaca output test & menelusuri penyebab error** (tabel gejala G1–G14, prosedur, cara jalankan di FlutLab) | Tugas 13 |
+| `contoh_output_gagal.log` | Contoh nyata output gagal yang menampilkan `reason` | Tugas 13 |
 | `tdd/01_red.log` … `05_refactor.log` | Bukti log RED/GREEN/refactor | Tugas 13 |
 | `flutter_test.log` | Log `flutter test` | Tugas 13 |
 | `flutter_analyze.log` | Log `flutter analyze` | — |
@@ -41,15 +43,18 @@ Hanya **kode target test** dan **test** yang dipertahankan.
 | `lib/services/notification_service.dart` | **Hanya** `buildOrderStatusContent` + `NotificationContent` (bagian murni yang diuji) |
 | `lib/services/device_service.dart` | **Hanya** `DeviceSummary.fromRaw` + `DeviceInfoEntry` (bagian murni yang diuji) |
 | `test/queue_estimator_test.dart` | Test TDD (5) |
+| `test/queue_estimator_diagnostic_test.dart` | Test diagnostik/regresi (8) |
 | `test/order_total_test.dart` | Test total keranjang (5) |
 | `test/json_parsing_test.dart` | Test parsing JSON (10) |
-| `test/validators_test.dart` | Test validasi form (15) |
+| `test/validators_test.dart` | Test validasi form (16) |
 | `test/services_test.dart` | Test service murni & formatter (11) |
 | `test/form_widget_test.dart` | Widget test Form validasi (5) |
 
 ## Angka ringkas
 
-- **51 test, semuanya lulus**; `flutter analyze` bersih.
+- **60 test, semuanya lulus**; `flutter analyze` bersih.
+- Setiap `expect()` punya `reason:` berisi input, harapan, dan dugaan penyebab —
+  kegagalan test menjelaskan dirinya sendiri.
 - 6 commit berurutan membuktikan TDD: stub → RED → GREEN → RED → GREEN → refactor.
 - 8 bug tercatat, semuanya selesai.
 - 13 skenario penilaian proses sistem terdokumentasi.

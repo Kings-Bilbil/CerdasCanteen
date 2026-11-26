@@ -1,0 +1,15 @@
+00:00 +0: loading D:/Project/perak/test/_contoh_gagal_sementara_test.dart
+00:00 +0: CONTOH GAGAL - estimasi salah
+00:00 +0 -1: CONTOH GAGAL - estimasi salah [E]
+  Expected: <15>
+    Actual: <13>
+  INPUT queueLength=3, itemCount=2 -> HARAP 15 menit (sengaja salah untuk contoh). Bila gagal: cek minutesPerItem atau rumus di lib/utils/queue_estimator.dart.
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\_contoh_gagal_sementara_test.dart 8:5          main.<fn>
+  
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  D:/Project/perak/test/_contoh_gagal_sementara_test.dart: CONTOH GAGAL - estimasi salah

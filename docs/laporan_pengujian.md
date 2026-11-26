@@ -4,15 +4,16 @@
 
 | Item | Hasil |
 |---|---|
-| Total test | **51 test** |
-| Lulus | **51** |
+| Total test | **60 test** |
+| Lulus | **60** |
 | Gagal | **0** |
 | `flutter analyze` | **No issues found** |
 | Siklus TDD | 2 siklus (rumus, validasi) + 1 refactor |
-| Unit test | 5 file (queue estimator, total keranjang, JSON parsing, validators, services) |
+| Unit test | 6 file (queue estimator, diagnostik estimator, total keranjang, JSON parsing, validators, services) |
 | Widget test | 1 file (`form_widget_test.dart`, 5 test) |
-| Log tersimpan | `docs/flutter_test.log`, `docs/flutter_analyze.log`, `docs/tdd/*.log` |
+| Log tersimpan | `docs/flutter_test.log`, `docs/flutter_analyze.log`, `docs/tdd/*.log`, `docs/contoh_output_gagal.log` |
 | Dependency plugin | **tidak ada** (test berjalan tanpa plugin native) |
+| Panduan membaca error | `docs/panduan_testing.md` |
 
 ## 2. Cara menjalankan
 
@@ -30,6 +31,10 @@ flutter analyze | Tee-Object -FilePath docs/flutter_analyze.log
 Di **FlutLab**, cukup buka tab *Test* atau jalankan `flutter test` di terminal —
 tidak diperlukan emulator maupun `pubspec` dengan plugin native.
 
+Cara membaca output test dan menelusuri penyebab kegagalan dijelaskan di
+**`docs/panduan_testing.md`** (termasuk tabel gejala → penyebab → tindakan
+G1–G14, dan bukti nyata di `docs/contoh_output_gagal.log`).
+
 ## 3. Daftar test per file
 
 ### 3.1 `test/queue_estimator_test.dart` — 5 test (Tugas 13, TDD)
@@ -44,7 +49,24 @@ tidak diperlukan emulator maupun `pubspec` dengan plugin native.
 
 File ini ditulis **sebelum** implementasi; bukti RED/GREEN ada di `docs/tdd/`.
 
-### 3.2 `test/order_total_test.dart` — 5 test (unit test: total harga keranjang)
+### 3.2 `test/queue_estimator_diagnostic_test.dart` — 8 test (diagnostik)
+
+File terpisah supaya nama dan jumlah test di `queue_estimator_test.dart` tetap
+sama dengan log TDD (`docs/tdd/01_red.log` … `05_refactor.log`). Tujuannya
+**mendeteksi regresi diam-diam**, bukan mengulang test rumus.
+
+| Kelompok | Test | Hasil |
+|---|---|---|
+| konstanta | `minutesPerQueue` bernilai 3 | LULUS |
+| konstanta | `minutesPerItem` bernilai 2 | LULUS |
+| sifat rumus | selisih antrean 3 orang = 3 × `minutesPerQueue` | LULUS |
+| sifat rumus | selisih 4 item = 4 × `minutesPerItem` | LULUS |
+| sifat rumus | 10 item tanpa antrean = 10 × `minutesPerItem` dan > 0 | LULUS |
+| pesan error | pesan negatif memuat kata `'negatif'` | LULUS |
+| pesan error | pesan pesanan kosong memuat `'minimal 1 item'` | LULUS |
+| pesan error | input negatif dilaporkan negatif, bukan "pesanan kosong" | LULUS |
+
+### 3.3 `test/order_total_test.dart` — 5 test (unit test: total harga keranjang)
 
 | Test | Hasil |
 |---|---|
@@ -54,7 +76,7 @@ File ini ditulis **sebelum** implementasi; bukti RED/GREEN ada di `docs/tdd/`.
 | keranjang kosong bernilai 0 dan ditandai kosong | LULUS |
 | satu item tetap dihitung benar | LULUS |
 
-### 3.3 `test/json_parsing_test.dart` — 10 test (unit test: parsing JSON)
+### 3.4 `test/json_parsing_test.dart` — 10 test (unit test: parsing JSON)
 
 | Test | Hasil |
 |---|---|
@@ -69,13 +91,13 @@ File ini ditulis **sebelum** implementasi; bukti RED/GREEN ada di `docs/tdd/`.
 | items bukan array melempar FormatException | LULUS |
 | round-trip toJson → fromJson konsisten | LULUS |
 
-### 3.4 `test/validators_test.dart` — 15 test (unit test: validasi form login/register)
+### 3.5 `test/validators_test.dart` — 16 test (unit test: validasi form login/register)
 
 Email (3 test), password (3), nama (3), konfirmasi password (3),
 `isFormValid` (2), dan `CheckoutRules` (2) — termasuk uji
 "keranjang kosong ditolak" untuk penilaian proses sistem Tugas 13.
 
-### 3.5 `test/services_test.dart` — 11 test (unit test: service murni)
+### 3.6 `test/services_test.dart` — 11 test (unit test: service murni)
 
 | Kelompok | Test | Hasil |
 |---|---|---|
@@ -90,7 +112,7 @@ Email (3 test), password (3), nama (3), konfirmasi password (3),
 | `Formatters` | formatEstimasiMenit < 1 jam | LULUS |
 | `Formatters` | formatEstimasiMenit > 1 jam | LULUS |
 
-### 3.6 `test/form_widget_test.dart` — 5 widget test (syarat "1 widget test")
+### 3.7 `test/form_widget_test.dart` — 5 widget test (syarat "1 widget test")
 
 File ini **tidak mengimpor `lib/screens/**`**. Ia merakit `Form` +
 `TextFormField` langsung di dalam test dan memakai `Validators.email` yang asli.
