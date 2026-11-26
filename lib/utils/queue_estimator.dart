@@ -4,6 +4,7 @@
 /// Aturan bisnis:
 /// - nilai negatif ditolak,
 /// - pesanan tanpa item ditolak.
+library;
 
 /// Menit tambahan untuk setiap orang yang sedang mengantre di depan kita.
 const int minutesPerQueue = 3;
