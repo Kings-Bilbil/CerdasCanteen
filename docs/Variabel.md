@@ -313,5 +313,5 @@ Widget test untuk kedua layar diparkir di `docs/rencana_test/*.pending`.
    `package:tubes_perak/...` sesuai lokasi baru.
 3. **Jangan ubah** nama field, nama fungsi, signature, dan teks pesan pada
    dokumen ini — test menguncinya.
-4. Jalankan `flutter test`. Bila ada yang merah, baca `reason:` pada output
-   (panduan lengkap: `docs/panduan_testing.md`).
+4. Jalankan `flutter test`. Bila ada yang merah, baca baris `reason:` pada
+   output test — isinya input, harapan, dan dugaan penyebabnya.
