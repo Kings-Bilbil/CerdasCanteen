@@ -33,3 +33,10 @@ ios/Flutter/ephemeral/
 # OS
 .DS_Store
 Thumbs.db
+
+# Berkas instruksi tugas — disimpan lokal, tidak di-commit
+Tugas.md
+TestingGuide.md
+
+# Cache Gradle (sudah pernah terlanjur ter-commit)
+android/.gradle/
