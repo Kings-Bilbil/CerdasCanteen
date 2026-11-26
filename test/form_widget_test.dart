@@ -1,127 +1,111 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'fixtures/utils/validators.dart';
+import 'package:provider/provider.dart';
+import 'package:tubes_perak/providers/auth_provider.dart';
+import 'package:tubes_perak/screens/login_screen.dart';
 
 // ============================================================================
-// WIDGET TEST — validasi form email
+// WIDGET TEST — form login asli (lib/screens/login_screen.dart)
 //
-// File ini TIDAK mengimpor `lib/screens/**`, jadi tetap bisa dijalankan di
-// FlutLab sebelum layar login/register dibuat Anggota 1. Widget Form dirakit
-// langsung di dalam test dan memakai `Validators.email` yang asli.
+// Yang diuji: aturan validasi Form milik layar login, bukan form tiruan.
+// AuthProvider disuntikkan lewat Provider agar layar bisa dirender.
 //
 // Cara membaca kegagalan:
 //   "Expected: exactly one matching node ... Actual: zero"
-//     -> pesan validasi tidak dirender. Cek `validator:` masih dipasang.
-//   "Bad state: No element" pada find.byKey -> key berubah/hilang.
+//     -> pesan validasi tidak muncul. Cek urutan validator di LoginScreen.
+//   "Bad state: No element" pada find.byType
+//     -> struktur layar berubah (mis. TextFormField diganti widget lain).
 // ============================================================================
 
-const Key _emailKey = Key('email-field');
-const Key _submitKey = Key('submit-button');
-
-/// Form login minimal: satu field email + tombol submit.
-class _EmailFormHarness extends StatefulWidget {
-  const _EmailFormHarness();
-
-  @override
-  State<_EmailFormHarness> createState() => _EmailFormHarnessState();
+Widget _buildLoginScreen() {
+  return ChangeNotifierProvider<AuthProvider>(
+    create: (_) => AuthProvider(),
+    child: const MaterialApp(home: LoginScreen()),
+  );
 }
 
-class _EmailFormHarnessState extends State<_EmailFormHarness> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  String? _submittedValue;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                key: _emailKey,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: Validators.email,
-              ),
-              ElevatedButton(
-                key: _submitKey,
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    setState(() => _submittedValue = 'terkirim');
-                  }
-                },
-                child: const Text('Masuk'),
-              ),
-              if (_submittedValue != null) Text('Status: $_submittedValue'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+Finder _fieldByLabel(String label) {
+  return find.ancestor(
+    of: find.text(label),
+    matching: find.byType(TextFormField),
+  );
 }
 
 void main() {
-  testWidgets('email kosong memunculkan pesan wajib diisi', (
+  testWidgets('email dikosongkan memunculkan pesan wajib diisi', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const _EmailFormHarness());
+    await tester.pumpWidget(_buildLoginScreen());
 
-    await tester.tap(find.byKey(_submitKey));
+    // Field terisi default; kosongkan dulu.
+    await tester.enterText(_fieldByLabel('Email Mahasiswa'), '');
+    await tester.tap(find.text('Masuk'));
     await tester.pumpAndSettle();
 
     expect(
       find.text('Email wajib diisi'),
       findsOneWidget,
-      reason: 'INPUT field email kosong + tekan Masuk -> HARAP pesan '
-          '"Email wajib diisi" tampil. Bila tidak muncul: validator belum '
-          'terpasang, atau tombol tidak memanggil FormState.validate().',
-    );
-    expect(
-      find.textContaining('Status:'),
-      findsNothing,
-      reason: 'Form tidak valid -> submit TIDAK boleh diteruskan. '
-          'Bila "Status: terkirim" muncul: validate() diabaikan.',
+      reason: 'INPUT email kosong + tekan Masuk -> HARAP pesan '
+          '"Email wajib diisi" tampil. Bila tidak: validator email hilang '
+          'atau tombol tidak memanggil FormState.validate().',
     );
   });
 
-  testWidgets('email valid meneruskan submit', (WidgetTester tester) async {
-    await tester.pumpWidget(const _EmailFormHarness());
-
-    await tester.enterText(find.byKey(_emailKey), 'mahasiswa@kampus.ac.id');
-    await tester.tap(find.byKey(_submitKey));
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text('Status: terkirim'),
-      findsOneWidget,
-      reason: 'INPUT email valid -> HARAP submit lolos dan penanda '
-          '"Status: terkirim" muncul. Bila tidak: validator menolak email '
-          'yang seharusnya sah (regex terlalu ketat).',
-    );
-    expect(
-      find.text('Email wajib diisi'),
-      findsNothing,
-      reason: 'Tidak boleh ada pesan error tersisa setelah input valid.',
-    );
-  });
-
-  testWidgets('email salah format memunculkan pesan format', (
+  testWidgets('email tanpa @ memunculkan pesan format', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const _EmailFormHarness());
+    await tester.pumpWidget(_buildLoginScreen());
 
-    await tester.enterText(find.byKey(_emailKey), 'tanpa-at');
-    await tester.tap(find.byKey(_submitKey));
+    await tester.enterText(_fieldByLabel('Email Mahasiswa'), 'tanpa-at');
+    await tester.tap(find.text('Masuk'));
     await tester.pumpAndSettle();
 
     expect(
       find.text('Format email tidak valid'),
       findsOneWidget,
-      reason: 'INPUT "tanpa-at" -> HARAP pesan format tidak valid. '
-          'Bila "Email wajib diisi": enterText gagal / controller tidak '
-          'terhubung.',
+      reason: 'INPUT "tanpa-at" -> HARAP pesan format. '
+          'Bila "Email wajib diisi": enterText gagal / controller salah.',
+    );
+  });
+
+  testWidgets('password kurang dari 6 karakter ditolak', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(_buildLoginScreen());
+
+    await tester.enterText(_fieldByLabel('Password'), '123');
+    await tester.tap(find.text('Masuk'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Password minimal 6 karakter'),
+      findsOneWidget,
+      reason: 'INPUT password "123" -> HARAP pesan minimal 6 karakter. '
+          'Bila tidak muncul: batas panjang password berubah.',
+    );
+  });
+
+  testWidgets('form kosong tidak memanggil proses login', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(_buildLoginScreen());
+
+    await tester.enterText(_fieldByLabel('Email Mahasiswa'), '');
+    await tester.enterText(_fieldByLabel('Password'), '');
+    await tester.tap(find.text('Masuk'));
+    await tester.pump();
+
+    // Validasi gagal -> isLoading tidak pernah aktif, jadi masih di halaman login.
+    expect(
+      find.byType(LoginScreen),
+      findsOneWidget,
+      reason: 'Form tidak valid -> HARAP tetap di LoginScreen. '
+          'Bila pindah halaman: validate() dilewati sebelum login().',
+    );
+    expect(
+      find.text('Password wajib diisi'),
+      findsOneWidget,
+      reason: 'Pesan untuk password kosong harus tampil bersamaan.',
     );
   });
 }
