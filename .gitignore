@@ -1,0 +1,44 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+
+# Android
+android/.gradle/
+android/local.properties
+android/app/debug/
+android/app/profile/
+android/app/release/
+android/key.properties
+*.jks
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/ephemeral/
+
+# Web / tooling
+.dart_tool/
+.settings/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Berkas instruksi tugas — disimpan lokal, tidak di-commit
+Tugas.md
+TestingGuide.md
+
+# Cache Gradle (sudah pernah terlanjur ter-commit)
+android/.gradle/
+
+pubspec.lock

@@ -1,0 +1,4 @@
+00:00 +0: loading D:/Project/perak/test/queue_estimator_test.dart
+00:00 +0: estimateWaitMinutes - rumus antrean kosong, 1 item = 2 menit
+00:00 +1: estimateWaitMinutes - rumus 3 antrean, 2 item = 13 menit
+00:00 +2: All tests passed!

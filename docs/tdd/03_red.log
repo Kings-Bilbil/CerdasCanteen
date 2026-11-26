@@ -1,0 +1,39 @@
+00:00 +0: loading D:/Project/perak/test/queue_estimator_test.dart
+00:00 +0: estimateWaitMinutes - rumus antrean kosong, 1 item = 2 menit
+00:00 +1: estimateWaitMinutes - rumus 3 antrean, 2 item = 13 menit
+00:00 +2: estimateWaitMinutes - validasi antrean negatif melempar ArgumentError
+00:00 +2 -1: estimateWaitMinutes - validasi antrean negatif melempar ArgumentError [E]
+  Expected: throws <Instance of 'ArgumentError'>
+    Actual: <Closure: () => int>
+     Which: returned <-1>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\queue_estimator_test.dart 17:7                 main.<fn>.<fn>
+  
+00:00 +2 -1: estimateWaitMinutes - validasi item negatif melempar ArgumentError
+00:00 +2 -2: estimateWaitMinutes - validasi item negatif melempar ArgumentError [E]
+  Expected: throws <Instance of 'ArgumentError'>
+    Actual: <Closure: () => int>
+     Which: returned <1>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\queue_estimator_test.dart 24:7                 main.<fn>.<fn>
+  
+00:00 +2 -2: estimateWaitMinutes - validasi pesanan kosong (0 item) melempar ArgumentError
+00:00 +2 -3: estimateWaitMinutes - validasi pesanan kosong (0 item) melempar ArgumentError [E]
+  Expected: throws <Instance of 'ArgumentError'>
+    Actual: <Closure: () => int>
+     Which: returned <6>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\queue_estimator_test.dart 31:7                 main.<fn>.<fn>
+  
+00:00 +2 -3: Some tests failed.
+
+Failing tests:
+  D:/Project/perak/test/queue_estimator_test.dart: estimateWaitMinutes - validasi antrean negatif melempar ArgumentError
+  D:/Project/perak/test/queue_estimator_test.dart: estimateWaitMinutes - validasi item negatif melempar ArgumentError
+  D:/Project/perak/test/queue_estimator_test.dart: estimateWaitMinutes - validasi pesanan kosong (0 item) melempar ArgumentError
