@@ -1,0 +1,18 @@
+00:00 +0: loading D:/Project/perak/test/queue_estimator_test.dart
+00:00 +0: estimateWaitMinutes - rumus antrean kosong, 1 item = 2 menit
+00:00 +0 -1: estimateWaitMinutes - rumus antrean kosong, 1 item = 2 menit [E]
+  UnimplementedError
+  package:tubes_perak/utils/queue_estimator.dart 7:3  estimateWaitMinutes
+  test\queue_estimator_test.dart 7:14                 main.<fn>.<fn>
+  
+00:00 +0 -1: estimateWaitMinutes - rumus 3 antrean, 2 item = 13 menit
+00:00 +0 -2: estimateWaitMinutes - rumus 3 antrean, 2 item = 13 menit [E]
+  UnimplementedError
+  package:tubes_perak/utils/queue_estimator.dart 7:3  estimateWaitMinutes
+  test\queue_estimator_test.dart 11:14                main.<fn>.<fn>
+  
+00:00 +0 -2: Some tests failed.
+
+Failing tests:
+  D:/Project/perak/test/queue_estimator_test.dart: estimateWaitMinutes - rumus 3 antrean, 2 item = 13 menit
+  D:/Project/perak/test/queue_estimator_test.dart: estimateWaitMinutes - rumus antrean kosong, 1 item = 2 menit
