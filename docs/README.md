@@ -11,7 +11,7 @@ Dokumentasi) sesuai `Tugas.md`.
 | `tdd_laporan.md` | Laporan TDD lengkap: aturan bisnis, 2 siklus RED–GREEN, refactor, refleksi | Tugas 13 |
 | `analisis_tugas13.md` | Penilaian proses sistem (13 skenario), data waktu antrean 10 responden, rekomendasi | Tugas 13 |
 | `nilai_bisnis_tugas14.md` | Manfaat QR struk & estimasi antrean bagi mahasiswa & kantin, model keberlanjutan | Tugas 14 |
-| `bug_log.md` | 7 bug dengan gejala → penyebab → solusi | Tugas 13 |
+| `bug_log.md` | 8 bug dengan gejala → penyebab → solusi | Tugas 13 |
 | `laporan_pengujian.md` | Rangkuman 53 test, daftar test per file, batas cakupan automated test | Tugas 13/14 |
 | `tdd/01_red.log` … `05_refactor.log` | Bukti log RED/GREEN/refactor | Tugas 13 |
 | `flutter_test.log` | Log `flutter test` (53 test lulus) | Tugas 13 |
@@ -45,7 +45,7 @@ Dokumentasi) sesuai `Tugas.md`.
 
 - 53 test, semuanya lulus; `flutter analyze` bersih.
 - 6 commit berurutan membuktikan TDD: stub → RED → GREEN → RED → GREEN → refactor.
-- 7 bug tercatat, semuanya selesai.
+- 8 bug tercatat, semuanya selesai.
 - 13 skenario penilaian proses sistem terdokumentasi.
 
 ## Yang masih perlu dilengkapi tim (bukan scope kode Anggota 3)

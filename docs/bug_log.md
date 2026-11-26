@@ -3,7 +3,7 @@
 Format tiap entri: **Gejala → Penyebab → Solusi**. Diisi sejak hari pertama
 integrasi, bukan di akhir proyek.
 
-Ringkasan: 7 bug tercatat, 7 selesai (✅), 0 terbuka. Dua bug pertama
+Ringkasan: 8 bug tercatat, 8 selesai (✅), 0 terbuka. Dua bug pertama
 (BUG-003 dan BUG-004) dipakai sebagai bahan analisis Tugas 13.
 
 ---
@@ -104,6 +104,29 @@ Ringkasan: 7 bug tercatat, 7 selesai (✅), 0 terbuka. Dua bug pertama
   "Tidak diketahui").
 - **Catatan desain.** Pola ini sekaligus perbaikan arsitektur: View tidak lagi
   bergantung langsung pada plugin, melainkan pada service yang bisa diganti.
+- **Status.** ✅ Selesai.
+
+---
+
+## BUG-008 — Log TDD tidak bisa dibuka (dianggap file biner)
+
+- **Gejala.** `docs/tdd/01_red.log` dan log lain gagal dibuka di editor;
+  muncul pesan "Cannot read binary file". Saat di-commit, diff-nya juga tidak
+  tampil.
+- **Penyebab.** `Tee-Object` pada PowerShell 5.1 menulis file keluaran dengan
+  encoding **UTF-16 LE + BOM**. Banyak editor dan GitHub menganggapnya biner.
+- **Solusi.** Semua file log dikonversi ke **UTF-8 tanpa BOM**:
+
+```powershell
+$raw = Get-Content docs/tdd/01_red.log -Encoding Unicode -Raw
+[System.IO.File]::WriteAllText(
+  (Resolve-Path docs/tdd/01_red.log), $raw,
+  (New-Object System.Text.UTF8Encoding $false))
+```
+
+  Isi log tidak diubah — hanya encoding-nya, sehingga bukti RED/GREEN tetap asli.
+- **Pencegahan.** Untuk run berikutnya, tambahkan `| Out-File -Encoding utf8`
+  atau pakai PowerShell 7 (`Tee-Object` di sana sudah UTF-8).
 - **Status.** ✅ Selesai.
 
 ---

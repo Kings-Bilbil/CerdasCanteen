@@ -126,3 +126,6 @@ test langsung memberi tahu. Test ini juga menjadi unit test pertama dari syarat
   mengaburkan bukti RED/GREEN modul ini.
 - Exit code RED = 1, GREEN = 0. Nilai exit code ini tercatat pada log
   (baris `===EXITCODE===` pada saat eksekusi).
+- File log awalnya tersimpan sebagai UTF-16 (default `Tee-Object` pada
+  PowerShell 5.1) sehingga terbaca sebagai biner di editor/GitHub. Log telah
+  dikonversi ke **UTF-8 tanpa BOM** agar bisa dibuka langsung.
