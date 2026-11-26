@@ -11,4 +11,27 @@ void main() {
       expect(estimateWaitMinutes(queueLength: 3, itemCount: 2), 13);
     });
   });
+
+  group('estimateWaitMinutes - validasi', () {
+    test('antrean negatif melempar ArgumentError', () {
+      expect(
+        () => estimateWaitMinutes(queueLength: -1, itemCount: 1),
+        throwsArgumentError,
+      );
+    });
+
+    test('item negatif melempar ArgumentError', () {
+      expect(
+        () => estimateWaitMinutes(queueLength: 1, itemCount: -1),
+        throwsArgumentError,
+      );
+    });
+
+    test('pesanan kosong (0 item) melempar ArgumentError', () {
+      expect(
+        () => estimateWaitMinutes(queueLength: 2, itemCount: 0),
+        throwsArgumentError,
+      );
+    });
+  });
 }
