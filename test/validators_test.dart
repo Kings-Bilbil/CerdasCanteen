@@ -1,81 +1,130 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'fixtures/utils/validators.dart';
+import 'package:tubes_perak/models/user_model.dart';
+import 'package:tubes_perak/services/auth_service.dart';
 
 // ============================================================================
-// UNIT TEST 3 — validasi form login/register + aturan checkout
+// UNIT TEST — validasi autentikasi (kode asli: lib/services/auth_service.dart)
+//
+// AuthService memakai `useDemoMode = true`, sehingga aturan validasi bisa diuji
+// tanpa server MySQL dan tanpa plugin native.
 //
 // Cara membaca kegagalan:
-//   "Expected: 'Email wajib diisi' Actual: null" -> validasi hilang.
-//
-// Teks pesan di file ini SAMA PERSIS dengan yang tampil di UI.
-// Kalau ingin mengganti kalimat, ubah test ini dan docs/Variabel.md §5.
+//   "Expected: throws <Instance of 'AuthException'>" -> aturan validasi hilang.
+//   Setiap expect memakai `reason:` berisi INPUT -> HARAPAN -> PENYEBAB UMUM.
 // ============================================================================
 
 void main() {
-  group('Validators.email', () {
-    test('email valid lolos', () {
+  group('AuthService.login', () {
+    test('akun demo yang benar mengembalikan user + token', () async {
+      final AuthService auth = AuthService();
+
+      final UserModel user = await auth.login(
+        email: 'mahasiswa@untan.ac.id',
+        password: '123456',
+      );
+
       expect(
-        Validators.email('mahasiswa@kampus.ac.id'),
-        isNull,
-        reason: 'INPUT email valid -> HARAP null. '
-            'Bila ada pesan error: regex terlalu ketat.',
+        user.email,
+        'mahasiswa@untan.ac.id',
+        reason: 'INPUT kredensial akun demo -> HARAP login berhasil.',
+      );
+      expect(
+        user.token,
+        isNotNull,
+        reason: 'Login sukses harus menghasilkan token sesi.',
       );
     });
 
-    test('email kosong dan salah format ditolak', () {
-      expect(
-        Validators.email(''),
-        'Email wajib diisi',
-        reason: 'INPUT kosong -> HARAP "Email wajib diisi". '
-            'Bila null: login bisa dikirim kosong.',
+    test('email dinormalisasi (spasi & huruf besar diabaikan)', () async {
+      final AuthService auth = AuthService();
+
+      final UserModel user = await auth.login(
+        email: '  MAHASISWA@UNTAN.AC.ID  ',
+        password: '123456',
       );
+
       expect(
-        Validators.email('tanpa-at'),
-        'Format email tidak valid',
-        reason: 'INPUT tanpa @ -> HARAP format tidak valid. '
-            'Bila lolos: regex tidak mewajibkan @.',
+        user.nim,
+        'H1101231001',
+        reason: 'INPUT email berspasi + kapital -> HARAP tetap cocok. '
+            'Bila AuthException: trim/toLowerCase belum dipakai.',
+      );
+    });
+
+    test('password salah ditolak', () async {
+      final AuthService auth = AuthService();
+
+      expect(
+        () => auth.login(email: 'mahasiswa@untan.ac.id', password: 'salah'),
+        throwsA(
+          isA<AuthException>().having(
+            (AuthException e) => e.message,
+            'message',
+            'Email atau password salah.',
+          ),
+        ),
+        reason: 'INPUT password salah -> HARAP AuthException dengan pesan jelas.',
+      );
+    });
+
+    test('email tidak terdaftar ditolak', () async {
+      final AuthService auth = AuthService();
+
+      expect(
+        () => auth.login(email: 'tidakada@untan.ac.id', password: '123456'),
+        throwsA(isA<AuthException>()),
+        reason: 'INPUT email asing -> HARAP AuthException, bukan user palsu.',
       );
     });
   });
 
-  group('Validators.password', () {
-    test('batas minimal 8 karakter', () {
-      expect(
-        Validators.password('rahasia123'),
-        isNull,
-        reason: 'INPUT 11 karakter -> HARAP null (minimum 8).',
-      );
-      expect(
-        Validators.password('1234567'),
-        'Password minimal 8 karakter',
-        reason: 'INPUT 7 karakter -> HARAP pesan minimal 8. '
-            'Bila null: batas panjang berubah atau dihapus.',
-      );
-    });
-  });
+  group('AuthService.register', () {
+    test('akun baru berhasil dibuat dan NIM jadi huruf besar', () async {
+      final AuthService auth = AuthService();
 
-  group('CheckoutRules (penilaian proses sistem)', () {
-    test('keranjang kosong ditolak', () {
+      final UserModel user = await auth.register(
+        nim: 'h1101239999',
+        nama: '  Mahasiswa Baru  ',
+        email: 'Baru@Untan.ac.id',
+        password: '123456',
+      );
+
       expect(
-        CheckoutRules.canCheckout(itemCount: 0),
-        isFalse,
-        reason: 'INPUT itemCount=0 -> HARAP tidak boleh checkout. '
-            'Bila true: pesanan kosong bisa dibuat (nilai Tugas 13 gagal).',
+        user.nim,
+        'H1101239999',
+        reason: 'INPUT nim huruf kecil -> HARAP disimpan KAPITAL.',
       );
       expect(
-        CheckoutRules.validateCart(itemCount: 0),
-        'Keranjang kosong, tidak bisa checkout',
-        reason: 'Pesan ini tampil ke pengguna saat checkout kosong. '
-            'Bila beda: ubah UI dan docs/Variabel.md §5 bersamaan.',
+        user.nama,
+        'Mahasiswa Baru',
+        reason: 'Nama harus di-trim dari spasi berlebih.',
+      );
+      expect(
+        user.email,
+        'baru@untan.ac.id',
+        reason: 'Email harus di-trim dan di-lowercase.',
       );
     });
 
-    test('keranjang berisi boleh checkout', () {
+    test('email yang sudah terdaftar ditolak', () async {
+      final AuthService auth = AuthService();
+
       expect(
-        CheckoutRules.canCheckout(itemCount: 1),
-        isTrue,
-        reason: 'INPUT 1 item -> HARAP boleh checkout. '
-            'Bila false: batas minimum berubah.',
+        () => auth.register(
+          nim: 'H1101238888',
+          nama: 'Duplikat',
+          email: 'mahasiswa@untan.ac.id',
+          password: '123456',
+        ),
+        throwsA(
+          isA<AuthException>().having(
+            (AuthException e) => e.message,
+            'message',
+            'Email sudah terdaftar. Silakan login.',
+          ),
+        ),
+        reason: 'INPUT email yang sudah ada -> HARAP ditolak, '
+            'bukan menimpa akun lama.',
       );
     });
   });

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'fixtures/utils/queue_estimator.dart';
+import 'package:tubes_perak/utils/queue_estimator.dart';
 
 // ============================================================================
 // FILE TEST: estimasi waktu antrean (Tugas 13 - TDD)
