@@ -90,7 +90,7 @@ Saat gagal, test mencetak blok seperti ini (nyata, dari
   Expected: <15>
     Actual: <13>
   INPUT queueLength=3, itemCount=2 -> HARAP 15 menit (sengaja salah untuk contoh).
-  Bila gagal: cek minutesPerItem atau rumus di lib/utils/queue_estimator.dart.
+  Bila gagal: cek minutesPerItem atau rumus di test/fixtures/utils/queue_estimator.dart.
   package:matcher ...
   test\_contoh_gagal_sementara_test.dart 8:5  main.<fn>
 ```
@@ -106,8 +106,8 @@ Cara membacanya, berurutan:
    menggantikan pekerjaan menebak.
 4. **Lokasi** (`test\...dart 8:5 main.<fn>`) — file test dan baris `expect` yang
    gagal. Berguna untuk membuka kembali test-nya.
-5. Kalau kegagalan berasal dari dalam kode produksi, ada juga baris
-   `package:tubes_perak/utils/...` — itu lokasi kode yang perlu diperbaiki.
+5. Kalau kegagalan berasal dari dalam kode yang diuji, ada juga baris
+   `test/fixtures/utils/...` — itu lokasi kode yang perlu diperbaiki.
 
 > **Tips:** kalau `reason` kosong pada suatu test, itu berarti test tersebut
 > belum memenuhi standar repo ini. Tambahkan `reason:`-nya.
@@ -125,7 +125,7 @@ Expected: <13>
   Actual: <15>
 ```
 
-Penyebab: rumus atau konstanta berubah. Cek `lib/utils/queue_estimator.dart`
+Penyebab: rumus atau konstanta berubah. Cek `test/fixtures/utils/queue_estimator.dart`
 (`minutesPerQueue`, `minutesPerItem`).
 
 ### 4.2 Fungsi tidak melempar error padahal seharusnya
@@ -149,7 +149,7 @@ mengubah test.
 
 ```
 UnimplementedError
-package:tubes_perak/utils/queue_estimator.dart 7:3
+test/fixtures/utils/queue_estimator.dart 7:3
 ```
 
 Ini **normal dan disengaja** pada fase RED TDD (`docs/tdd/01_red.log`). Isinya
@@ -164,10 +164,10 @@ Tabel ini adalah rujukan utama saat membaca error.
 
 | Kode | Gejala di output | Penyebab paling mungkin | Tindakan |
 |---|---|---|---|
-| **G1** | `Error: Couldn't resolve the package '...'` atau `Target of URI doesn't exist` | nama package di `import` salah | Package harus **`tubes_perak`**. Contoh benar: `import 'package:tubes_perak/utils/queue_estimator.dart';` |
+| **G1** | `Error: Couldn't resolve the package '...'` atau `Target of URI doesn't exist` | path import salah | Test memakai path relatif: `import 'fixtures/utils/queue_estimator.dart';`. Kalau ada yang masih memakai `package:tubes_perak/...` sementara file ada di `test/fixtures/`, ganti ke path relatif |
 | **G2** | `The method 'X' isn't defined for the type 'Y'` | nama fungsi/field berubah di kode produksi | Samakan dengan kontrak di `docs/Variabel.md`, atau perbaiki test bila memang nama baru disepakati |
 | **G3** | `Too few positional arguments: 2 required, 1 given` | lupa matcher pada `expect`, mis. `expect(a < b, reason: ...)` | tambahkan matcher: `expect(a < b, isTrue, reason: ...)` |
-| **G4** | `Expected: <13>` `Actual: <15>` | rumus/konstanta berubah | cek `minutesPerQueue` / `minutesPerItem` di `lib/utils/queue_estimator.dart` |
+| **G4** | `Expected: <13>` `Actual: <15>` | rumus/konstanta berubah | cek `minutesPerQueue` / `minutesPerItem` di `test/fixtures/utils/queue_estimator.dart` |
 | **G5** | `Expected: throws ...` + `Which: returned <n>` | validasi input hilang | tambahkan pengecekan negatif / `itemCount == 0` |
 | **G6** | `Expected: throws ...` + `Which: threw <pesan lain>` | urutan pengecekan salah (mis. cek "0 item" sebelum cek negatif) | cek negatif **lebih dulu**, baru cek pesanan kosong. Diuji di `queue_estimator_diagnostic_test.dart` |
 | **G7** | `UnimplementedError` | masih stub fase RED | bukan bug — lanjut implementasi (GREEN) |

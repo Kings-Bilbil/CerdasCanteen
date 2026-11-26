@@ -10,20 +10,53 @@ sama** agar test tetap lulus saat diintegrasikan.
 
 ---
 
-## 0. Prasyarat: nama package
+## 0. Struktur folder: kenapa kode uji ada di `test/fixtures/`
 
-| Variabel | Nilai | Dipakai di |
-|---|---|---|
-| Nama package (`pubspec.yaml` → `name`) | **`tubes_perak`** | Semua `import 'package:tubes_perak/...'` pada file test |
+**Penting untuk Anggota 1 & 2.** Semua kode yang diuji Anggota 3 berada di
+**`test/fixtures/`**, bukan di `lib/`:
 
-**Yang harus disesuaikan:** seluruh file test mengimpor dengan prefix
-`package:tubes_perak/`. Kalau package diganti nama (mis. `cerdascanteen`), semua
-import di folder `test/` wajib di-rename. Kalau tidak, test gagal karena *error
-import* — bukan kegagalan test yang sah.
+```
+lib/
+└── main.dart                  <- satu-satunya file di lib/ (tidak disentuh)
+
+test/
+├── queue_estimator_test.dart
+├── queue_estimator_diagnostic_test.dart
+├── order_total_test.dart
+├── json_parsing_test.dart
+├── validators_test.dart
+├── services_test.dart
+├── form_widget_test.dart
+└── fixtures/                   <- target test, AMAN dari konflik git
+    ├── models/
+    │   ├── order.dart
+    │   └── order_item.dart
+    ├── services/
+    │   ├── device_service.dart
+    │   └── notification_service.dart
+    └── utils/
+        ├── formatters.dart
+        ├── queue_estimator.dart
+        └── validators.dart
+```
+
+**Alasan:** `lib/` adalah wilayah kerja Anggota 1 & 2 (layar, service API,
+model mereka). Kalau file pengujian ditaruh di `lib/`, cepat atau lambat akan
+**bertabrakan path** — misalnya Anggota 2 membuat `lib/models/order.dart`
+versinya sendiri, atau `lib/services/api_service.dart` berbeda isi. Dengan
+menaruhnya di `test/fixtures/`, tidak ada satu pun path yang bisa bentrok
+dengan kode developer, dan test tetap bisa dijalankan.
+
+**Konsekuensi saat integrasi:** karena test mengimpor **path relatif**
+(`import 'fixtures/utils/queue_estimator.dart';`), saat implementasi asli
+sudah ada di `lib/`, ubah import test menjadi
+`import 'package:tubes_perak/utils/queue_estimator.dart';` (atau path
+`lib/` yang disepakati). Yang **tidak boleh berubah** adalah nama variabel,
+signature fungsi, dan teks pesan — semuanya didokumentasikan di bawah ini.
 
 ---
 
-## 1. `lib/utils/queue_estimator.dart` — inti TDD (Tugas 13)
+## 1. `test/fixtures/utils/queue_estimator.dart` — inti TDD (Tugas 13)
 
 | Variabel / fungsi | Nilai / Signature | Keterangan |
 |---|---|---|
@@ -54,7 +87,7 @@ Contoh teruji: `queueLength: 0, itemCount: 1` → **2**; `queueLength: 3, itemCo
 
 ---
 
-## 2. `lib/models/order_item.dart` — model item keranjang
+## 2. `test/fixtures/models/order_item.dart` — model item keranjang
 
 ### Field objek
 
@@ -103,7 +136,7 @@ Nilai `double` diubah dengan `.toInt()`; `String` diparse dengan `int.tryParse` 
 
 ---
 
-## 3. `lib/models/order.dart` — model pesanan & status
+## 3. `test/fixtures/models/order.dart` — model pesanan & status
 
 ### Enum `OrderStatus`
 
@@ -162,7 +195,7 @@ mencari teks persis `'Siap Diambil'` dan `'Diproses'`.
 
 ---
 
-## 4. `lib/services/notification_service.dart` — fitur native Tugas 12
+## 4. `test/fixtures/services/notification_service.dart` — fitur native Tugas 12
 
 ### `NotificationContent`
 
@@ -233,7 +266,7 @@ harus dipenuhi saat implementasi:
 
 ---
 
-## 5. `lib/utils/validators.dart` — validasi form login/register
+## 5. `test/fixtures/utils/validators.dart` — validasi form login/register
 
 Semua fungsi bersifat `static` dan **mengembalikan `String?`** (`null` = valid).
 Teks pesan di bawah **diperiksa persis** oleh test.
@@ -298,7 +331,7 @@ Contoh ditolak: `tanpa-at`, `budi@`, `budi@kampus` (domain tanpa titik).
 
 ---
 
-## 6. `lib/utils/formatters.dart`
+## 6. `test/fixtures/utils/formatters.dart`
 
 | Fungsi | Signature | Contoh teruji |
 |---|---|---|
@@ -317,7 +350,7 @@ test formatter diperbarui.
 
 ---
 
-## 7. `lib/services/device_service.dart` — fitur native info perangkat
+## 7. `test/fixtures/services/device_service.dart` — fitur native info perangkat
 
 ### `DeviceInfoEntry`
 

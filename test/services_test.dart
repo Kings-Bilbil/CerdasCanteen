@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tubes_perak/models/order.dart';
-import 'package:tubes_perak/services/device_service.dart';
-import 'package:tubes_perak/services/notification_service.dart';
-import 'package:tubes_perak/utils/formatters.dart';
+import 'fixtures/models/order.dart';
+import 'fixtures/services/device_service.dart';
+import 'fixtures/services/notification_service.dart';
+import 'fixtures/utils/formatters.dart';
 
 // ============================================================================
 // FILE TEST: bagian murni dari service + formatter

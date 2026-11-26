@@ -26,13 +26,21 @@ Contoh: antrean 3 orang, 2 item → (3 × 3) + (2 × 2) = **13 menit**.
 
 ## 2. Daftar bukti
 
+> **Catatan path.** Log di `docs/tdd/` adalah keluaran **asli** saat proses
+> TDD berjalan, ketika kode masih berada di `lib/utils/queue_estimator.dart`.
+> Setelah repo dibatasi menjadi deliverable testing dan kode dipindah ke
+> `test/fixtures/` agar tidak bertabrakan dengan kode Anggota 1 & 2, log
+> **sengaja tidak diubah** — itu bukti historis. Path yang terlihat di log
+> (`package:tubes_perak/utils/queue_estimator.dart`) merujuk lokasi lama;
+> lokasi sekarang: `test/fixtures/utils/queue_estimator.dart`.
+
 | No | Bukti | Lokasi | Status |
 |---|---|---|---|
 | 1 | Deskripsi fitur & aturan bisnis | `docs/tdd_laporan.md` (dokumen ini) | ✅ |
 | 2 | Stub kosong tanpa logika | riwayat commit `chore: stub queue estimator` | ✅ |
 | 3 | File test ditulis sebelum implementasi | `test/queue_estimator_test.dart` | ✅ |
 | 4 | Log RED siklus 1 | `docs/tdd/01_red.log` | ✅ |
-| 5 | Implementasi minimal | `lib/utils/queue_estimator.dart` | ✅ |
+| 5 | Implementasi minimal | `test/fixtures/utils/queue_estimator.dart` | ✅ |
 | 6 | Log GREEN siklus 1 | `docs/tdd/02_green.log` | ✅ |
 | 7 | Log RED siklus 2 (validasi) | `docs/tdd/03_red.log` | ✅ |
 | 8 | Log GREEN siklus 2 | `docs/tdd/04_green.log` | ✅ |
@@ -42,7 +50,7 @@ Contoh: antrean 3 orang, 2 item → (3 × 3) + (2 × 2) = **13 menit**.
 
 ## 3. Siklus 1 — rumus
 
-- **RED.** `lib/utils/queue_estimator.dart` masih stub
+- **RED.** `test/fixtures/utils/queue_estimator.dart` masih stub
   `throw UnimplementedError();`. Test rumus ditulis lebih dulu, lalu dijalankan.
   Hasil: **2 test gagal** dengan `UnimplementedError`
   (`01_red.log`). Ini kegagalan test yang sah, bukan kegagalan import.

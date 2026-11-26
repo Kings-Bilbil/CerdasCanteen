@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tubes_perak/models/order.dart';
-import 'package:tubes_perak/models/order_item.dart';
+import 'fixtures/models/order.dart';
+import 'fixtures/models/order_item.dart';
 
 // ============================================================================
 // FILE TEST: total harga keranjang
