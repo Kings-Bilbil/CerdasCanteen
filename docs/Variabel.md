@@ -1,11 +1,12 @@
 # Variabel yang Dipakai Testing — Daftar untuk Developer
 
-Daftar **nama variabel, field, konstanta, dan teks** yang dipakai test Anggota 3.
+Daftar **nama variabel, field, konstanta, dan teks** yang dikunci oleh test.
 Developer (Anggota 1 & 2) cukup menyesuaikan nama/nilai di bawah ini agar test
 tetap lulus saat diintegrasikan.
 
-**Lokasi kode yang diuji:** `test/fixtures/` (bukan `lib/`, agar tidak bentrok).
-**Lokasi test:** `test/*.dart`
+- **Lokasi kode yang diuji:** `test/fixtures/` (bukan `lib/`, agar tidak bentrok)
+- **Lokasi test:** `test/*.dart`
+- **Jumlah test:** 22 (19 unit + 3 widget)
 
 ---
 
@@ -18,18 +19,18 @@ tetap lulus saat diintegrasikan.
 | `minutesPerQueue` | `3` |
 | `minutesPerItem` | `2` |
 
-**Fungsi**
-
-| Nama | Signature |
-|---|---|
-| `estimateWaitMinutes` | `int estimateWaitMinutes({required int queueLength, required int itemCount})` |
-
 **Parameter**
 
 | Nama | Tipe |
 |---|---|
 | `queueLength` | `int` |
 | `itemCount` | `int` |
+
+**Fungsi**
+
+| Nama | Signature |
+|---|---|
+| `estimateWaitMinutes` | `int estimateWaitMinutes({required int queueLength, required int itemCount})` |
 
 **Teks pesan error (harus persis)**
 
@@ -58,13 +59,13 @@ tetap lulus saat diintegrasikan.
 
 **Key JSON masuk (`fromJson`)**
 
-| Key | Alias yang diterima | Tipe | Default |
+| Key | Alias diterima | Tipe | Default |
 |---|---|---|---|
 | `nama` | `name` | `String` | wajib |
 | `harga` | `price` | `int` / `double` / `String` angka | wajib |
 | `qty` | `jumlah` | `int` / `double` / `String` angka | `1` |
 
-**Key JSON keluar (`toJson`)**: `nama`, `harga`, `qty`
+**Key JSON keluar (`toJson`):** `nama`, `harga`, `qty`
 
 **Teks pesan error (harus persis)**
 
@@ -116,7 +117,7 @@ Fungsi: `OrderStatus.fromString(String value)` — fallback ke `diproses`.
 | `status` | `String` | `Diproses` |
 | `queue_length` | `int` | `0` |
 
-**Key JSON keluar (`toJson`)**: `id`, `items`, `status`, `queue_length`
+**Key JSON keluar (`toJson`):** `id`, `items`, `status`, `queue_length`
 
 **Teks pesan error (harus persis)**
 
@@ -127,53 +128,7 @@ Fungsi: `OrderStatus.fromString(String value)` — fallback ke `diproses`.
 
 ---
 
-## 4. `test/fixtures/services/notification_service.dart`
-
-**Class `NotificationContent`**
-
-| Field | Tipe |
-|---|---|
-| `title` | `String` |
-| `body` | `String` |
-
-**Fungsi**
-
-| Nama | Signature |
-|---|---|
-| `buildOrderStatusContent` | `NotificationContent buildOrderStatusContent(OrderStatus status, {String? orderId, int? estimateMinutes})` |
-
-**Teks `title` (harus persis)**
-
-| Status | Tanpa `orderId` | Dengan `orderId` |
-|---|---|---|
-| `diproses` | `Pesanan Diproses` | `Pesanan #<id> Diproses` |
-| `siapDiambil` | `Pesanan Siap Diambil!` | `Pesanan #<id> Siap Diambil!` |
-| `selesai` | `Pesanan Selesai` | `Pesanan #<id> Selesai` |
-
-**Teks `body` (harus persis)**
-
-| Status | Body |
-|---|---|
-| `diproses` | `Pesananmu sedang dibuat oleh kantin. Mohon tunggu sebentar ya.` |
-| `siapDiambil` | `Silakan ambil pesananmu di konter kantin sebelum dingin.` + ` Estimasi tunggu ±<N> menit.` (hanya bila `estimateMinutes` tidak null) |
-| `selesai` | `Terima kasih sudah memesan di CerdasCanteen. Selamat makan!` |
-
-**Kontrak `NotificationService` (belum ada di repo, dibutuhkan saat implementasi)**
-
-| Item | Nilai |
-|---|---|
-| `channelId` | `cerdascanteen_order_status` |
-| `channelName` | `Status Pesanan` |
-
-| Method | Signature |
-|---|---|
-| `init` | `Future<void> init()` |
-| `requestPermission` | `Future<bool> requestPermission()` |
-| `showOrderStatus` | `Future<void> showOrderStatus(OrderStatus status, {String? orderId, int? estimateMinutes, int? notificationId})` |
-
----
-
-## 5. `test/fixtures/utils/validators.dart`
+## 4. `test/fixtures/utils/validators.dart`
 
 **Class `Validators`** (semua `static`)
 
@@ -218,72 +173,7 @@ Fungsi: `OrderStatus.fromString(String value)` — fallback ke `diproses`.
 
 ---
 
-## 6. `test/fixtures/utils/formatters.dart`
-
-| Nama | Signature | Contoh |
-|---|---|---|
-| `formatRupiah` | `String formatRupiah(int amount)` | `15000` → `Rp15.000` |
-| `formatEstimasiMenit` | `String formatEstimasiMenit(int minutes)` | `13` → `13 menit`<br>`65` → `1 jam 5 menit`<br>`120` → `2 jam` |
-
----
-
-## 7. `test/fixtures/services/device_service.dart`
-
-**Class `DeviceInfoEntry`**
-
-| Field | Tipe |
-|---|---|
-| `label` | `String` |
-| `value` | `String` |
-
-Constructor: `DeviceInfoEntry(String label, String value)`
-
-**Class `DeviceSummary`**
-
-| Field / getter | Tipe |
-|---|---|
-| `entries` | `List<DeviceInfoEntry>` |
-| `isEmpty` | `bool` |
-| `displayed` | `List<DeviceInfoEntry>` |
-
-| Method | Signature |
-|---|---|
-| `DeviceSummary.fromRaw` | `factory DeviceSummary.fromRaw({String? manufacturer, String? model, String? brand, String? device, String? androidVersion, int? sdkInt, String? iosName, String? iosSystemVersion, String? iosModel, String? webBrowserName, String? webPlatform, String? fcmToken, DateTime? now})` |
-
-**Label yang dihasilkan `fromRaw`**
-
-| Parameter | Label entri |
-|---|---|
-| `manufacturer` + `model` | `Perangkat` |
-| `brand` | `Merek` |
-| `device` | `Nama internal` |
-| `androidVersion` (+ `sdkInt`) | `Versi Android` (contoh `Android 13 (API 33)`) |
-| `sdkInt` saja | `API Level` |
-| `iosName` | `Perangkat iOS` |
-| `iosModel` | `Model iOS` |
-| `iosSystemVersion` | `Versi iOS` |
-| `webBrowserName` | `Browser` |
-| `webPlatform` | `Platform Web` |
-| `fcmToken` | `Token notifikasi` |
-| `now` (atau `DateTime.now()`) | `Login terakhir` |
-
-**Aturan pemotongan `fcmToken`**: panjang ≤ 16 → utuh; lebih dari 16 →
-`8 karakter awal` + `…` + `6 karakter akhir`
-
-**Format `Login terakhir`**: `dd/MM/yyyy HH:mm`
-
-**Nilai fallback** saat data gagal dibaca: `Tidak diketahui`
-
-| Item | Nilai |
-|---|---|
-| tipe injeksi test | `typedef DeviceSummaryLoader = Future<DeviceSummary> Function();` |
-| constructor | `DeviceService({DeviceInfoPlugin? plugin, DeviceSummaryLoader? loader})` |
-| method | `Future<DeviceSummary> load({bool forceRefresh = false})` |
-| method | `void clearCache()` |
-
----
-
-## 8. Variabel khusus test (tidak perlu diubah developer)
+## 5. Variabel khusus widget test (tidak perlu diubah developer)
 
 | Nama | Nilai | Dipakai di |
 |---|---|---|
@@ -293,20 +183,50 @@ Constructor: `DeviceInfoEntry(String label, String value)`
 
 ---
 
-## 9. Fitur yang belum ada kodenya (perlu dibuat developer)
+## 6. Fitur Tugas 12 yang belum ada kodenya (kontrak untuk developer)
 
-| Path yang dibutuhkan | Isi minimum |
+Bagian ini **tidak diuji** saat ini, tetapi nilainya sudah ditentukan agar
+implementasi konsisten bila test-nya ditambahkan nanti.
+
+**Notifikasi status pesanan**
+
+| Item | Nilai |
 |---|---|
-| `lib/screens/qr_receipt_screen.dart` | getter `resolvedEstimate` (int), getter `qrData` (String) berisi baris `CERDASCANTEEN`, `ID:`, `ITEM:`, `TOTAL:`, `EST:`, `STATUS:` |
-| `lib/screens/profile_screen.dart` | menampilkan `DeviceSummary.entries`, tombol notifikasi |
-| `lib/notifikasi` (class `NotificationService`) | sesuai kontrak bagian 4 |
-| `lib/services/device_service.dart` (jalur plugin) | `load()` + `clearCache()`, wajib bisa diinjeksi `DeviceSummaryLoader` |
+| `title` Diproses | `Pesanan Diproses` / `Pesanan #<id> Diproses` |
+| `title` Siap Diambil | `Pesanan Siap Diambil!` / `Pesanan #<id> Siap Diambil!` |
+| `title` Selesai | `Pesanan Selesai` / `Pesanan #<id> Selesai` |
+| `body` Diproses | `Pesananmu sedang dibuat oleh kantin. Mohon tunggu sebentar ya.` |
+| `body` Siap Diambil | `Silakan ambil pesananmu di konter kantin sebelum dingin.` + ` Estimasi tunggu ±<N> menit.` |
+| `body` Selesai | `Terima kasih sudah memesan di CerdasCanteen. Selamat makan!` |
+| `channelId` | `cerdascanteen_order_status` |
+| `channelName` | `Status Pesanan` |
 
-Widget test untuk kedua layar diparkir di `docs/rencana_test/*.pending`.
+**Formatter**
+
+| Nama | Signature | Contoh |
+|---|---|---|
+| `formatRupiah` | `String formatRupiah(int amount)` | `15000` → `Rp15.000` |
+| `formatEstimasiMenit` | `String formatEstimasiMenit(int minutes)` | `13` → `13 menit`<br>`65` → `1 jam 5 menit`<br>`120` → `2 jam` |
+
+**Info perangkat**
+
+| Item | Nilai |
+|---|---|
+| label | `Perangkat`, `Merek`, `Nama internal`, `Versi Android`, `API Level`, `Perangkat iOS`, `Model iOS`, `Versi iOS`, `Browser`, `Platform Web`, `Token notifikasi`, `Login terakhir` |
+| fallback data gagal | `Tidak diketahui` |
+| format tanggal | `dd/MM/yyyy HH:mm` |
+| injeksi untuk test | `typedef DeviceSummaryLoader = Future<DeviceSummary> Function();` |
+
+**Layar (belum dibuat)**
+
+| Path | Isi minimum |
+|---|---|
+| `lib/screens/qr_receipt_screen.dart` | getter `resolvedEstimate` (int) dan `qrData` (String) berisi baris `CERDASCANTEEN`, `ID:`, `ITEM:`, `TOTAL:`, `EST:`, `STATUS:` |
+| `lib/screens/profile_screen.dart` | menampilkan ringkasan perangkat + tombol notifikasi |
 
 ---
 
-## 10. Cara memakai daftar ini saat integrasi
+## 7. Cara memakai daftar ini saat integrasi
 
 1. Implementasikan fitur di `lib/` (atau path yang disepakati tim).
 2. Ubah import di file test dari `fixtures/...` menjadi
