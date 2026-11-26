@@ -2,11 +2,13 @@
 
 ## 1. Fitur yang dinilai
 
-1. **Struk digital ber-QR** (`lib/screens/qr_receipt_screen.dart`) — menampilkan
-   kode pesanan, rincian item, total, status, dan estimasi tunggu dalam satu QR.
+1. **Struk digital ber-QR** (layar struk; kontrak di `docs/Variabel.md` §9) —
+   menampilkan kode pesanan, rincian item, total, status, dan estimasi tunggu
+   dalam satu QR. Payload QR diuji lewat `QrReceiptScreen.qrData` pada widget
+   test yang diparkir di `docs/rencana_test/`.
 2. **Estimasi waktu antrean** (`lib/utils/queue_estimator.dart`) — perhitungan
    `(antrean × 3) + (item × 2)` menit, disajikan di layar struk dan dipakai
-   pada notifikasi "Siap Diambil".
+   pada notifikasi "Siap Diambil". Modul ini aktif dan teruji di repo.
 
 ## 2. Manfaat bagi mahasiswa
 

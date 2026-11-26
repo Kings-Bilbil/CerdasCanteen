@@ -18,8 +18,8 @@ keputusan. Hasilnya:
 | 9 | Form login dengan email salah format | Apakah ditolak? | Pesan error | **`'Format email tidak valid'`** | `test/validators_test.dart` |
 | 10 | Password < 8 karakter | Apakah ditolak? | Pesan error | **`'Password minimal 8 karakter'`** | `test/validators_test.dart` |
 | 11 | Konfirmasi password berbeda | Apakah ditolak? | Pesan error | **`'Konfirmasi password tidak sama'`** | `test/validators_test.dart` |
-| 12 | Izin notifikasi ditolak | Apakah aplikasi crash? | Tidak, ada penjelasan | **Tidak crash**, muncul dialog penjelasan | `lib/screens/profile_screen.dart` (`_cobaNotifikasi`) |
-| 13 | Info perangkat gagal dibaca | Apakah halaman error? | Tetap tampil | **Tetap tampil** dengan fallback "Tidak diketahui" | `lib/services/device_service.dart` |
+| 12 | Izin notifikasi ditolak | Apakah aplikasi crash? | Tidak, ada penjelasan | **Tidak crash**, muncul dialog penjelasan (kontrak wajib; BUG-004) | kontrak `docs/Variabel.md` §4 |
+| 13 | Info perangkat gagal dibaca | Apakah halaman error? | Tetap tampil | **Tetap tampil** dengan fallback "Tidak diketahui" (`DeviceSummary.fromRaw(model: 'Tidak diketahui')`) | `test/services_test.dart` + kontrak `docs/Variabel.md` §7 |
 
 **Kesimpulan proses sistem.** Jalur kritis (keranjang kosong, input tidak valid,
 data rusak, izin ditolak) sudah tertutup dan diuji. Yang **belum** tertutup dan

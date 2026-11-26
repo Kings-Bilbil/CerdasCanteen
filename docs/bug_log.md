@@ -6,6 +6,14 @@ integrasi, bukan di akhir proyek.
 Ringkasan: 8 bug tercatat, 8 selesai (✅), 0 terbuka. Dua bug pertama
 (BUG-003 dan BUG-004) dipakai sebagai bahan analisis Tugas 13.
 
+> **Catatan cakupan.** Repo ini sekarang hanya memuat deliverable testing
+> (kode target test + test). Bug BUG-003 sampai BUG-007 terjadi saat prototipe
+> fitur native masih ada di repo; entri dipertahankan karena bug log adalah
+> bukti proses QA yang dinilai, bukan karena kodenya masih ada. Kontrak yang
+> harus dipenuhi saat tim mengimplementasikan ulang ada di `docs/Variabel.md`.
+> BUG-006 dan BUG-007 merujuk file test yang kini diparkir di
+> `docs/rencana_test/`.
+
 ---
 
 ## BUG-001 — `UnimplementedError` saat test estimasi antrean
@@ -76,8 +84,12 @@ Ringkasan: 8 bug tercatat, 8 selesai (✅), 0 terbuka. Dua bug pertama
 
 ## BUG-006 — `OrderItem` tidak dikenali pada `QrReceiptScreen`
 
+> Layar ini sudah ditarik dari repo (bukan scope testing). Entri dipertahankan
+> sebagai catatan QA; kontraknya ada di `docs/Variabel.md` §9 dan widget test-nya
+> diparkir di `docs/rencana_test/qr_receipt_screen_test.dart.pending`.
+
 - **Gejala.** `flutter test` gagal saat kompilasi:
-  `Error: 'OrderItem' isn't a type` pada `lib/screens/qr_receipt_screen.dart`.
+  `Error: 'OrderItem' isn't a type` pada layar struk QR.
 - **Penyebab.** File memakai tipe `OrderItem` di dalam `map()` tetapi hanya
   mengimpor `models/order.dart`; `order_item.dart` tidak diimpor (meski
   `order.dart` mengeksposnya secara tidak langsung saat runtime, import tetap
@@ -88,6 +100,11 @@ Ringkasan: 8 bug tercatat, 8 selesai (✅), 0 terbuka. Dua bug pertama
 ---
 
 ## BUG-007 — Widget test ProfileScreen "pumpAndSettle timed out"
+
+> Widget test ini kini diparkir di
+> `docs/rencana_test/profile_screen_test.dart.pending`. Pelajarannya tetap
+> berlaku: kelas `DeviceService` di repo **wajib** mempertahankan parameter
+> `DeviceSummaryLoader` untuk injeksi saat test.
 
 - **Gejala.** `flutter test test/profile_screen_test.dart` gagal dengan
   `pumpAndSettle timed out` pada semua test. Mode kegagalan ini berbahaya karena

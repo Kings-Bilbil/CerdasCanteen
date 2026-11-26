@@ -1,8 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Notifikasi lokal status pesanan (Android 13+ wajib izin runtime). -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-
     <application
         android:label="tubesperak"
         android:name="${applicationName}"

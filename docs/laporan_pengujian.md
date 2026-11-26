@@ -4,14 +4,15 @@
 
 | Item | Hasil |
 |---|---|
-| Total test | **53 test** |
-| Lulus | **53** |
+| Total test | **51 test** |
+| Lulus | **51** |
 | Gagal | **0** |
 | `flutter analyze` | **No issues found** |
 | Siklus TDD | 2 siklus (rumus, validasi) + 1 refactor |
 | Unit test | 5 file (queue estimator, total keranjang, JSON parsing, validators, services) |
-| Widget test | 2 file (`qr_receipt_screen_test.dart` 4 test, `profile_screen_test.dart` 3 test) |
+| Widget test | 1 file (`form_widget_test.dart`, 5 test) |
 | Log tersimpan | `docs/flutter_test.log`, `docs/flutter_analyze.log`, `docs/tdd/*.log` |
+| Dependency plugin | **tidak ada** (test berjalan tanpa plugin native) |
 
 ## 2. Cara menjalankan
 
@@ -24,10 +25,10 @@ flutter test test/queue_estimator_test.dart | Tee-Object -FilePath docs/tdd/01_r
 
 # Analisis statis
 flutter analyze | Tee-Object -FilePath docs/flutter_analyze.log
-
-# Demo fitur native (tanpa bentrok dengan main.dart milik Anggota 1)
-flutter run -t lib/main_anggota3_demo.dart
 ```
+
+Di **FlutLab**, cukup buka tab *Test* atau jalankan `flutter test` di terminal —
+tidak diperlukan emulator maupun `pubspec` dengan plugin native.
 
 ## 3. Daftar test per file
 
@@ -74,7 +75,7 @@ Email (3 test), password (3), nama (3), konfirmasi password (3),
 `isFormValid` (2), dan `CheckoutRules` (2) — termasuk uji
 "keranjang kosong ditolak" untuk penilaian proses sistem Tugas 13.
 
-### 3.5 `test/services_test.dart` — 11 test (unit test: service)
+### 3.5 `test/services_test.dart` — 11 test (unit test: service murni)
 
 | Kelompok | Test | Hasil |
 |---|---|---|
@@ -89,25 +90,24 @@ Email (3 test), password (3), nama (3), konfirmasi password (3),
 | `Formatters` | formatEstimasiMenit < 1 jam | LULUS |
 | `Formatters` | formatEstimasiMenit > 1 jam | LULUS |
 
-### 3.6 `test/qr_receipt_screen_test.dart` — 4 widget test (Tugas 14)
+### 3.6 `test/form_widget_test.dart` — 5 widget test (syarat "1 widget test")
+
+File ini **tidak mengimpor `lib/screens/**`**. Ia merakit `Form` +
+`TextFormField` langsung di dalam test dan memakai `Validators.email` yang asli.
+Dengan begitu widget test tetap bisa dijalankan di FlutLab meskipun layar
+login/register belum dibuat Anggota 1.
 
 | Widget test | Yang diperiksa | Hasil |
 |---|---|---|
-| menampilkan widget QR, estimasi, dan total | `QrImageView` muncul, teks "15 menit", total Rp35.000, subtotal, nama item, status, jumlah antrean, instruksi ke kasir | LULUS |
-| estimasi manual mengalahkan hitung otomatis | `estimateMinutes: 25` mengalahkan hasil `estimateWaitMinutes` | LULUS |
-| data QR memuat ringkasan pesanan | payload berisi `CERDASCANTEEN`, `ID:CC-2024`, `TOTAL:35000`, `EST:15` | LULUS |
-| status Siap Diambil tampil sebagai chip | chip status + estimasi 2 menit (antrean 0, 1 item) | LULUS |
+| email kosong memunculkan pesan wajib diisi | teks `'Email wajib diisi'` muncul, submit tidak lolos | LULUS |
+| email salah format memunculkan pesan format | teks `'Format email tidak valid'` | LULUS |
+| email valid meneruskan submit | teks `'Status: terkirim'` muncul | LULUS |
+| pesan error hilang setelah input diperbaiki | error hilang, submit lolos | LULUS |
+| teks hasil formatter bisa dirender | `'Rp35.000'` dan `'15 menit'` tampil | LULUS |
 
-### 3.7 `test/profile_screen_test.dart` — 3 widget test (Tugas 12)
-
-| Widget test | Yang diperiksa | Hasil |
-|---|---|---|
-| menampilkan identitas mahasiswa dan info perangkat | spinner saat loading, nama & NIM, baris "Perangkat"/"Versi Android" dari `DeviceSummary`, tombol notifikasi | LULUS |
-| tombol refresh memuat ulang info perangkat | tap ikon refresh memicu pemuatan ulang dan data kembali tampil | LULUS |
-| loader gagal tetap menampilkan fallback, bukan error | error dari service ditangkap; UI menampilkan "Tidak diketahui" | LULUS |
-
-Widget test ini memakai `DeviceService(loader: ...)` (dependency injection)
-sehingga tidak butuh plugin native saat test.
+Widget test berbasis layar aplikasi (`QrReceiptScreen`, `ProfileScreen`) sengaja
+**diparkir** di `docs/rencana_test/*.pending` karena layarnya adalah kode
+implementasi sistem. Kontraknya didokumentasikan di `docs/Variabel.md` bagian 9.
 
 ## 4. Bukti TDD (ringkas)
 
@@ -122,27 +122,29 @@ sehingga tidak butuh plugin native saat test.
 
 Penjelasan lengkap: `docs/tdd_laporan.md`.
 
-## 5. Yang tidak tercakup automated test (dan cara diverifikasinya)
+## 5. Yang tidak tercakup automated test
 
-| Fitur | Alasan | Verifikasi manual |
+Karena repo hanya berisi kode testing, bagian berikut **belum ada kodenya** dan
+harus diimplementasikan tim:
+
+| Fitur | Alasan | Cara verifikasi setelah dibuat |
 |---|---|---|
-| `NotificationService.init()` / `show()` / `requestPermission()` | Butuh platform channel Android/iOS | `flutter run -t lib/main_anggota3_demo.dart` → Profil → tombol notifikasi |
-| `DeviceService.load()` (jalur plugin nyata) | Butuh plugin native | Buka layar Profil, cek daftar info perangkat + tombol refresh |
-| Tampilan nyata `QrImageView` (hasil scan) | Perlu kamera perangkat | Scan QR dengan HP lain, cocokkan payload |
+| `NotificationService` (plugin) | Butuh platform channel Android/iOS | Jalankan app → Profil → tombol notifikasi |
+| `DeviceService.load()` (jalur plugin) | Butuh plugin native | Buka layar Profil, cek info perangkat |
+| `QrReceiptScreen` / tampilan QR | Bergantung layar sistem | Scan QR, cocokkan payload |
+| `ProfileScreen` | Bergantung layar sistem | Buka layar Profil |
 
-Logika yang bisa dipisahkan (pembuatan judul/isi notifikasi, ringkasan
-perangkat, format rupiah/menit) sudah dipisah agar tetap bisa diuji tanpa
-perangkat — lihat `buildOrderStatusContent`, `DeviceSummary.fromRaw`, dan
-`lib/utils/formatters.dart`. Halaman Profil juga menerima `DeviceService`
-palsu lewat konstruktor, sehingga alur UI-nya bisa diuji.
+Bagian murni yang bisa diuji sudah dipisah dan diuji: `buildOrderStatusContent`,
+`DeviceSummary.fromRaw`, `formatRupiah`, `formatEstimasiMenit`. Kontrak lengkap
+untuk implementasi ada di `docs/Variabel.md`.
 
 ## 6. Catatan kegagalan yang pernah terjadi saat testing
 
 | Kegagalan | Penyebab | Perbaikan |
 |---|---|---|
-| `'OrderItem' isn't a type` | import tidak lengkap di `qr_receipt_screen.dart` | tambah `import '../models/order_item.dart'` |
-| `getter 'data' isn't defined for QrImageView` | `QrImageView` tidak mengekspos `data` sebagai field publik | test memeriksa `QrReceiptScreen.qrData` + keberadaan `QrImageView` |
-| payload berisi `ID:Instance of 'Order'.id` | interpolasi `'$order.id'` | diubah menjadi `'${order.id}'` |
-| `pumpAndSettle timed out` pada ProfileScreen | plugin native tidak ada di lingkungan test → Future tidak pernah selesai, spinner beranimasi terus | tambah `DeviceServiceLoader` untuk injeksi; test memakai loader palsu |
 | `avoid_print` (13 peringatan) | `dart_basics` memang mencetak ke konsol | `ignore_for_file: avoid_print` |
 | `dangling_library_doc_comments` | doc library tanpa direktif | tambah `library;` |
+| Log TDD terbaca biner | `Tee-Object` PS 5.1 menulis UTF-16 | dikonversi ke UTF-8 tanpa BOM |
+
+Riwayat lengkap 8 bug (termasuk bug integrasi saat kode sistem masih ada) ada di
+`docs/bug_log.md`.

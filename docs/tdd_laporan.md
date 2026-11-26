@@ -4,8 +4,10 @@ Dokumen ini melengkapi checklist bukti TDD pada `TestingGuide.md` bagian A.
 
 ## 1. Fitur dan aturan bisnis
 
-Fitur menghitung estimasi waktu tunggu pesanan di CerdasCanteen, dipakai pada
-layar struk digital (`QrReceiptScreen`) dan notifikasi "Siap Diambil".
+Fitur menghitung estimasi waktu tunggu pesanan di CerdasCanteen. Nilainya
+dipakai oleh layar struk digital (QR) dan notifikasi "Siap Diambil" pada
+implementasi sistem; modul ini sendiri berdiri sendiri sehingga bisa diuji
+tanpa layar (lihat `docs/Variabel.md`).
 
 Rumus:
 

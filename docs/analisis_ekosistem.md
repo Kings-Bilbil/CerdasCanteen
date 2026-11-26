@@ -94,22 +94,24 @@ pihak ketiga agar mudah dinilai):
 ┌───────────────────────────────────────────────┐
 │ VIEW  (lib/screens/**)                        │
 │ - Hanya menggambar UI & meneruskan aksi       │
-│ - Contoh: QrReceiptScreen, ProfileScreen       │
+│ - Rencana: layar Struk QR & Profil            │
 └───────────────┬───────────────────────────────┘
                 │ membaca state / memanggil aksi
 ┌───────────────▼───────────────────────────────┐
 │ STATE  (StatefulWidget / Future state)        │
 │ - Menyimpan data yang ditampilkan             │
-│ - Contoh: _deviceFuture di _ProfileScreenState│
+│ - Rencana: future info perangkat di Profil    │
 │ - Menangani loading / error / data kosong     │
 └───────────────┬───────────────────────────────┘
                 │ meminta data / menjalankan logika
 ┌───────────────▼───────────────────────────────┐
 │ SERVICE & UTIL (lib/services, lib/utils)      │
-│ - NotificationService  (notifikasi lokal)     │
-│ - DeviceService        (info perangkat)       │
+│ - buildOrderStatusContent (isi notifikasi)    │
+│ - DeviceSummary.fromRaw   (ringkasan device)  │
 │ - estimateWaitMinutes  (aturan bisnis murni)  │
 │ - Validators, CheckoutRules (validasi form)   │
+│ - NotificationService / DeviceService:        │
+│   kontrak ada di docs/Variabel.md             │
 └───────────────┬───────────────────────────────┘
                 │
         Plugin native / platform channel
@@ -120,15 +122,15 @@ Aturan yang dipegang:
 1. **Logika bisnis tidak boleh berada di widget.** Rumus estimasi antrean ada di
    `lib/utils/queue_estimator.dart`, bukan di dalam `build()`. Konsekuensinya
    logika ini bisa diuji dengan `flutter test` tanpa emulator.
-2. **Service tidak tahu tentang widget.** `NotificationService.showOrderStatus()`
-   hanya butuh `OrderStatus`, sehingga bisa dipanggil dari alur checkout
-   (Anggota 1) maupun dari halaman profil.
-3. **Kegagalan fitur native tidak mematikan aplikasi.** Service menangkap
-   exception dan mengembalikan `false`; UI menampilkan pesan ramah
-   (lihat `_cobaNotifikasi()` saat izin ditolak).
-4. **Dependency injection lewat konstruktor.** `ProfileScreen` menerima
-   `DeviceService`, dan `DeviceService` sendiri menerima `DeviceSummaryLoader`,
-   sehingga plugin native bisa diganti objek palsu saat pengujian.
+2. **Service tidak tahu tentang widget.** Penyusun isi notifikasi
+   (`buildOrderStatusContent`) hanya butuh `OrderStatus`, sehingga bisa dipanggil
+   dari alur checkout (Anggota 1) maupun dari halaman profil.
+3. **Kegagalan fitur native tidak mematikan aplikasi.** Saat implementasi, service
+   wajib menangkap exception dan mengembalikan `false`; UI menampilkan pesan ramah
+   saat izin ditolak.
+4. **Dependency injection lewat konstruktor.** Rancangan `ProfileScreen` menerima
+   `DeviceService`, dan `DeviceService` menerima `DeviceSummaryLoader`, sehingga
+   plugin native bisa diganti objek palsu saat pengujian (BUG-007).
 
 ## 5. Wireframe tiga layar utama
 
@@ -216,8 +218,8 @@ Navigasi bawah: Menu | Pesanan | Profil
 
 | Risiko | Dampak | Mitigasi |
 |---|---|---|
-| Plugin notifikasi tidak mendukung versi Flutter terbaru | Fitur native gagal | Versi plugin dikunci di `pubspec.yaml`; kegagalan ditangkap dan dilaporkan ke pengguna |
-| `flutter_local_notifications` butuh desugaring | Build Android gagal | `isCoreLibraryDesugaringEnabled = true` + dependency `desugar_jdk_libs` sudah ditambahkan |
-| Izin notifikasi ditolak pengguna | Notifikasi tidak muncul | Aplikasi tetap berjalan; muncul dialog penjelasan, bukan crash |
+| Plugin notifikasi tidak mendukung versi Flutter terbaru | Fitur native gagal | Versi plugin dikunci di `pubspec.yaml` saat implementasi; kegagalan ditangkap dan dilaporkan ke pengguna |
+| `flutter_local_notifications` butuh desugaring | Build Android gagal | Saat implementasi: `isCoreLibraryDesugaringEnabled = true` + dependency `desugar_jdk_libs` (BUG-005) |
+| Izin notifikasi ditolak pengguna | Notifikasi tidak muncul | Aplikasi tetap berjalan; muncul dialog penjelasan, bukan crash (BUG-004) |
 | Kode anggota lain belum selesai saat integrasi | Test gagal massal | Test dijalankan per file (`flutter test test/xxx_test.dart`) |
 | Data perangkat tidak terbaca (mis. di web) | Halaman profil error | `DeviceService` menangkap error dan menampilkan "Tidak diketahui" |

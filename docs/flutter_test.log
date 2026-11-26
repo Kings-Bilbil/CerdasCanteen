@@ -1,56 +1,53 @@
-00:00 +0: loading D:/Project/perak/test/json_parsing_test.dart
-00:00 +0: D:/Project/perak/test/json_parsing_test.dart: OrderItem.fromJson parsing JSON normal
-00:00 +1: D:/Project/perak/test/json_parsing_test.dart: OrderItem.fromJson parsing dari string JSON (angka dikirim sebagai teks)
-00:00 +2: D:/Project/perak/test/json_parsing_test.dart: OrderItem.fromJson mendukung alias field bahasa Inggris
-00:00 +3: D:/Project/perak/test/json_parsing_test.dart: OrderItem.fromJson nama kosong melempar FormatException
-00:00 +4: D:/Project/perak/test/json_parsing_test.dart: OrderItem.fromJson harga negatif melempar FormatException
-00:00 +5: D:/Project/perak/test/json_parsing_test.dart: OrderItem.fromJson qty 0 melempar FormatException
-00:00 +6: D:/Project/perak/test/json_parsing_test.dart: Order.fromJson parsing order lengkap
-00:00 +7: D:/Project/perak/test/json_parsing_test.dart: Order.fromJson status tidak dikenal jatuh ke Diproses
-00:00 +8: D:/Project/perak/test/json_parsing_test.dart: Order.fromJson items bukan array melempar FormatException
-00:00 +9: D:/Project/perak/test/json_parsing_test.dart: Order.fromJson round-trip toJson -> fromJson konsisten
-00:00 +10: D:/Project/perak/test/order_total_test.dart: OrderItem.subtotal harga x qty
-00:00 +11: D:/Project/perak/test/order_total_test.dart: OrderItem.subtotal qty 1 sama dengan harga satuan
-00:00 +12: D:/Project/perak/test/order_total_test.dart: Order.totalPrice (total harga keranjang) menjumlahkan subtotal semua item
-00:00 +13: D:/Project/perak/test/order_total_test.dart: Order.totalPrice (total harga keranjang) keranjang kosong bernilai 0 dan ditandai kosong
-00:00 +14: D:/Project/perak/test/order_total_test.dart: Order.totalPrice (total harga keranjang) satu item tetap dihitung benar
-00:00 +15: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +16: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +17: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +18: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +19: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +20: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +21: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +22: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +23: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +24: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +25: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +26: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +27: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +28: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +29: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +30: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +31: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +32: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +33: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +34: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +35: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +36: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +37: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +38: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +39: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +40: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +41: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +42: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +43: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +44: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +45: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:01 +46: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen menampilkan identitas mahasiswa dan info perangkat
-00:02 +47: D:/Project/perak/test/qr_receipt_screen_test.dart: QrReceiptScreen menampilkan widget QR, estimasi, dan total
-00:03 +48: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen tombol refresh memuat ulang info perangkat
-00:03 +49: D:/Project/perak/test/qr_receipt_screen_test.dart: QrReceiptScreen estimasi manual mengalahkan hasil hitung otomatis
-00:03 +50: D:/Project/perak/test/profile_screen_test.dart: ProfileScreen loader gagal tetap menampilkan fallback, bukan error
-DeviceService.load gagal: Exception: plugin tidak tersedia
-00:03 +51: D:/Project/perak/test/qr_receipt_screen_test.dart: QrReceiptScreen data QR memuat ringkasan pesanan
-00:03 +52: D:/Project/perak/test/qr_receipt_screen_test.dart: QrReceiptScreen status Siap Diambil tampil sebagai chip
-00:03 +53: All tests passed!
+00:00 +0: loading D:/Project/perak/test/form_widget_test.dart
+00:00 +0: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +1: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +2: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +3: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +4: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +5: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +6: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +7: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +8: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +9: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +10: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +11: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +12: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +13: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +14: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +15: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +16: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +17: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +18: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +19: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +20: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +21: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +22: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +23: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +24: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +25: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +26: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +27: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +28: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +29: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +30: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +31: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +32: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +33: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +34: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +35: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +36: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +37: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +38: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +39: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +40: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +41: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +42: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +43: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +44: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +45: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:00 +46: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email kosong memunculkan pesan wajib diisi
+00:01 +47: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email salah format memunculkan pesan format
+00:01 +48: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form email valid meneruskan submit
+00:02 +49: D:/Project/perak/test/form_widget_test.dart: Widget test - validasi email pada Form pesan error hilang setelah input diperbaiki
+00:02 +50: D:/Project/perak/test/form_widget_test.dart: Widget test - teks estimasi & rupiah tampil di widget teks hasil formatter bisa dirender
+00:02 +51: All tests passed!
