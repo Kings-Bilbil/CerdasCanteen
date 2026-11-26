@@ -113,7 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Menambahkan item ke CartProvider (kontrak Anggota 1) dan menampilkan SnackBar.
   void _tambahKeKeranjang(MenuItem item) {
-    context.read<CartProvider>().addItem(item);
+    // Konversi MenuItem ke CanteenMenu agar langsung klop dengan CartProvider Anggota 1
+    context.read<CartProvider>().addItem(item.toCanteenMenu());
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -137,8 +138,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final Color warnaHeader =
         isDark ? const Color(0xFF162A1D) : AppTheme.leafGreen;
 
-    // Pantau jumlah item di keranjang untuk badge ikon Cart
-    final int jumlahKeranjang = context.watch<CartProvider>().items.length;
+    // Pantau total jumlah item di keranjang untuk badge ikon Cart
+    final int jumlahKeranjang = context.watch<CartProvider>().totalItemCount;
 
     // [WIDGET WAJIB: Scaffold] Kerangka dasar layar HomeScreen
     return Scaffold(

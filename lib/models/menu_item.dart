@@ -1,4 +1,5 @@
 // lib/models/menu_item.dart
+import 'canteen_item.dart';
 
 /// Model data untuk satu item menu kantin pada aplikasi CerdasCanteen.
 /// Sesuai kontrak bersama Anggota 1 (jangan ubah nama field & method).
@@ -122,6 +123,19 @@ class MenuItem {
       kategori: kategori ?? this.kategori,
       deskripsi: deskripsi ?? this.deskripsi,
       rating: rating ?? this.rating,
+    );
+  }
+
+  /// Adapter konversi ke model `CanteenMenu` milik Anggota 1 agar langsung
+  /// tersambung dengan `CartProvider.addItem(...)` tanpa mengubah file Anggota 1.
+  CanteenMenu toCanteenMenu() {
+    return CanteenMenu(
+      id: id.toString(),
+      nama: nama,
+      harga: harga.round(),
+      kategori: kategori,
+      deskripsi: deskripsi,
+      gambarUrl: imageUrl,
     );
   }
 
