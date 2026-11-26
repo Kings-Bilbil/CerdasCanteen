@@ -40,3 +40,5 @@ TestingGuide.md
 
 # Cache Gradle (sudah pernah terlanjur ter-commit)
 android/.gradle/
+
+pubspec.lock
