@@ -1,484 +1,317 @@
-# Variabel & Kontrak Kode — Yang Perlu Disesuaikan Saat Implementasi Sistem
+# Variabel yang Dipakai Testing — Daftar untuk Developer
 
-Dokumen ini berisi **semua nama variabel, nama field, nama fungsi, teks pesan, dan
-nilai konstanta** yang dipakai oleh test Anggota 3. Test sudah mengunci nilai-nilai
-ini, jadi **implementasi sistem (Anggota 1 & 2) harus memakai nama dan nilai yang
-sama** agar test tetap lulus saat diintegrasikan.
+Daftar **nama variabel, field, konstanta, dan teks** yang dipakai test Anggota 3.
+Developer (Anggota 1 & 2) cukup menyesuaikan nama/nilai di bawah ini agar test
+tetap lulus saat diintegrasikan.
 
-> Aturan praktis: kalau ingin mengganti nama field atau teks pesan, **ubah test-nya
-> dulu** (itu TDD), jangan diam-diam mengubah kode lalu membiarkan test merah.
-
----
-
-## 0. Struktur folder: kenapa kode uji ada di `test/fixtures/`
-
-**Penting untuk Anggota 1 & 2.** Semua kode yang diuji Anggota 3 berada di
-**`test/fixtures/`**, bukan di `lib/`:
-
-```
-lib/
-└── main.dart                  <- satu-satunya file di lib/ (tidak disentuh)
-
-test/
-├── queue_estimator_test.dart
-├── queue_estimator_diagnostic_test.dart
-├── order_total_test.dart
-├── json_parsing_test.dart
-├── validators_test.dart
-├── services_test.dart
-├── form_widget_test.dart
-└── fixtures/                   <- target test, AMAN dari konflik git
-    ├── models/
-    │   ├── order.dart
-    │   └── order_item.dart
-    ├── services/
-    │   ├── device_service.dart
-    │   └── notification_service.dart
-    └── utils/
-        ├── formatters.dart
-        ├── queue_estimator.dart
-        └── validators.dart
-```
-
-**Alasan:** `lib/` adalah wilayah kerja Anggota 1 & 2 (layar, service API,
-model mereka). Kalau file pengujian ditaruh di `lib/`, cepat atau lambat akan
-**bertabrakan path** — misalnya Anggota 2 membuat `lib/models/order.dart`
-versinya sendiri, atau `lib/services/api_service.dart` berbeda isi. Dengan
-menaruhnya di `test/fixtures/`, tidak ada satu pun path yang bisa bentrok
-dengan kode developer, dan test tetap bisa dijalankan.
-
-**Konsekuensi saat integrasi:** karena test mengimpor **path relatif**
-(`import 'fixtures/utils/queue_estimator.dart';`), saat implementasi asli
-sudah ada di `lib/`, ubah import test menjadi
-`import 'package:tubes_perak/utils/queue_estimator.dart';` (atau path
-`lib/` yang disepakati). Yang **tidak boleh berubah** adalah nama variabel,
-signature fungsi, dan teks pesan — semuanya didokumentasikan di bawah ini.
+**Lokasi kode yang diuji:** `test/fixtures/` (bukan `lib/`, agar tidak bentrok).
+**Lokasi test:** `test/*.dart`
 
 ---
 
-## 1. `test/fixtures/utils/queue_estimator.dart` — inti TDD (Tugas 13)
+## 1. `test/fixtures/utils/queue_estimator.dart`
 
-| Variabel / fungsi | Nilai / Signature | Keterangan |
-|---|---|---|
-| `minutesPerQueue` | `const int = 3` | menit per orang dalam antrean |
-| `minutesPerItem` | `const int = 2` | menit per item pesanan |
-| `estimateWaitMinutes` | `int estimateWaitMinutes({required int queueLength, required int itemCount})` | nama & named parameter **wajib sama** |
+**Konstanta**
 
-**Aturan bisnis yang dikunci test:**
-
-| Kondisi | Perilaku wajib | Teks `ArgumentError` |
-|---|---|---|
-| `queueLength < 0` **atau** `itemCount < 0` | `throw ArgumentError` | `'Nilai tidak boleh negatif'` |
-| `itemCount == 0` | `throw ArgumentError` | `'Pesanan harus berisi minimal 1 item'` |
-| selain itu | `return (queueLength * 3) + (itemCount * 2)` | — |
-
-Contoh teruji: `queueLength: 0, itemCount: 1` → **2**; `queueLength: 3, itemCount: 2` → **13**.
-
-**Yang harus disesuaikan implementasi:**
-
-1. Kalau layar checkout punya rumus sendiri (mis. menit per antrean = 2,5), **jangan
-   ditulis ulang di widget**. Panggil `estimateWaitMinutes` supaya nilai tetap satu sumber.
-2. Kalau `minutesPerQueue`/`minutesPerItem` ingin diubah (mis. hasil kalibrasi data
-   antrean di `docs/analisis_tugas13.md`), ubah **konstantanya saja** — test rumus
-   (`0/1→2`, `3/2→13`) akan gagal sehingga harus diperbarui bersamaan. Itu memang tujuan TDD.
-3. Alur checkout **tidak boleh** memanggil fungsi ini dengan `itemCount: 0`; validasi
-   keranjang kosong dilakukan lewat `CheckoutRules` (bagian 5) sebelum memanggil estimator,
-   agar tidak terjadi `ArgumentError` yang tidak tertangani.
-
----
-
-## 2. `test/fixtures/models/order_item.dart` — model item keranjang
-
-### Field objek
-
-| Field | Tipe | Wajib | Keterangan |
-|---|---|---|---|
-| `name` | `String` | ya | nama menu |
-| `price` | `int` | ya | harga satuan, **rupiah, bilangan bulat** (bukan `double`) |
-| `qty` | `int` | ya | jumlah pesan |
-
-- Konstruktor: `const OrderItem({required String name, required int price, required int qty})`
-- Getter: `int get subtotal` → `price * qty`
-- `Map<String, dynamic> toJson()`
-- `factory OrderItem.fromJson(Map<String, dynamic> json)`
-
-### Kunci JSON yang diterima (urutan prioritas)
-
-| Data | Kunci utama | Alias yang juga diterima | Default |
-|---|---|---|---|
-| nama | `nama` | `name` | — (wajib) |
-| harga | `harga` | `price` | — (wajib) |
-| jumlah | `qty` | `jumlah` | **`1`** bila tidak dikirim |
-
-**Yang harus disesuaikan implementasi API/model:**
-
-1. Harga **harus `int`**. Test memeriksa `item.price == 15000`. Kalau backend mengirim
-   `15000.0` (double) atau `"15000"` (string), `fromJson` sudah menanganinya — tetapi
-   jangan mengubah field `price` menjadi `double`, karena `formatRupiah(int)` dan
-   `subtotal` bertipe `int`.
-2. Kalau backend memakai nama field lain (mis. `menu_name`, `unit_price`, `quantity`),
-   tambahkan alias di `OrderItem.fromJson`, **jangan** ganti nama `name`/`price`/`qty`.
-3. `qty` default `1` dipertahankan test ("mendukung alias field bahasa Inggris"),
-   jadi jangan mengubah default menjadi `0`.
-
-### Aturan validasi `fromJson` (semua → `FormatException`)
-
-| Kondisi | Pesan |
+| Nama | Nilai |
 |---|---|
-| `nama`/`name` tidak ada, bukan `String`, atau kosong/spasi | `'Field "nama" wajib ada dan berupa teks'` |
-| `harga`/`price` tidak ada | `'Field "harga" tidak ditemukan'` |
-| `harga` bukan int/double/string angka | `'Field "harga" tidak valid: <nilai>'` |
-| `harga < 0` | `'Harga tidak boleh negatif'` |
-| `qty <= 0` | `'Jumlah item harus minimal 1'` |
-| field lain tidak valid | `'Field "<field>" tidak valid: <nilai>'` |
+| `minutesPerQueue` | `3` |
+| `minutesPerItem` | `2` |
 
-Nilai `double` diubah dengan `.toInt()`; `String` diparse dengan `int.tryParse` (setelah `trim()`).
+**Fungsi**
 
----
-
-## 3. `test/fixtures/models/order.dart` — model pesanan & status
-
-### Enum `OrderStatus`
-
-| Nilai enum | `label` (dipakai UI & JSON) |
+| Nama | Signature |
 |---|---|
-| `OrderStatus.diproses` | `'Diproses'` |
-| `OrderStatus.siapDiambil` | `'Siap Diambil'` |
-| `OrderStatus.selesai` | `'Selesai'` |
+| `estimateWaitMinutes` | `int estimateWaitMinutes({required int queueLength, required int itemCount})` |
 
-- `static OrderStatus fromString(String value)` — mencocokkan `label` **atau** `name`
-  (case-insensitive, `trim()`). Nilai tak dikenal → **`OrderStatus.diproses`**
-  (tidak melempar error).
+**Parameter**
 
-**Yang harus disesuaikan implementasi:** semua tempat yang menampilkan status ke
-pengguna harus memakai `status.label`, **bukan** `status.name`, supaya teks
-"**Siap Diambil**" (dengan spasi & huruf kapital) tetap konsisten. Test widget
-mencari teks persis `'Siap Diambil'` dan `'Diproses'`.
+| Nama | Tipe |
+|---|---|
+| `queueLength` | `int` |
+| `itemCount` | `int` |
 
-### Field `Order`
+**Teks pesan error (harus persis)**
 
-| Field | Tipe | Default | Keterangan |
-|---|---|---|---|
-| `id` | `String` | — (wajib) | kode pesanan, mis. `CC-2024` |
-| `items` | `List<OrderItem>` | — (wajib) | isi keranjang |
-| `status` | `OrderStatus` | `OrderStatus.diproses` | status awal setelah checkout |
-| `queueLength` | `int` | **`0`** | jumlah orang mengantre **di depan** pesanan ini |
-
-- `const Order({required String id, required List<OrderItem> items, OrderStatus status = OrderStatus.diproses, int queueLength = 0})`
-- `int get totalPrice` → jumlah `subtotal` semua item (contoh: 2×15.000 + 3×5.000 = **45000**)
-- `int get totalItems` → jumlah **kuantitas** (contoh di atas = **5**), bukan jumlah baris
-- `bool get isEmpty` → `items.isEmpty`
-- `fromJson` / `toJson`
-
-### Kunci JSON `Order`
-
-| Data | Kunci JSON | Default bila tidak ada |
-|---|---|---|
-| id | `id` | `''` |
-| item | `items` (**wajib `List`**) | — (`FormatException` bila bukan array) |
-| status | `status` | `diproses` |
-| panjang antrean | `queue_length` | `0` |
-
-**Yang harus disesuaikan implementasi:**
-
-1. `totalPrice` **belum** menghitung diskon/pajak/biaya layanan. Kalau fitur diskon
-   ditambahkan, buat getter baru (mis. `grandTotal`) — **jangan ubah `totalPrice`**,
-   karena test total keranjang mengunci angka 45000/12000/0.
-2. `queueLength` adalah **jumlah orang di depan**, termasuk nol. Jangan diganti menjadi
-   `estimatedMinutes` atau `posisiAntrean`, karena nama ini dipakai `QrReceiptScreen`
-   dan `estimateWaitMinutes(queueLength: ...)`.
-3. Kunci `queue_length` (snake_case) dipertahankan. Kalau backend memakai
-   `queueLength`/`antrean`, tambahkan alias di `Order.fromJson`.
-4. Setiap item di `items` **harus** objek (`Map`); kalau tidak →
-   `FormatException('Setiap item harus berupa objek')`. `items` bukan `List` →
-   `FormatException('Field "items" harus berupa array')`.
+| Kondisi | Teks |
+|---|---|
+| nilai negatif | `Nilai tidak boleh negatif` |
+| `itemCount == 0` | `Pesanan harus berisi minimal 1 item` |
 
 ---
 
-## 4. `test/fixtures/services/notification_service.dart` — fitur native Tugas 12
+## 2. `test/fixtures/models/order_item.dart` — class `OrderItem`
 
-### `NotificationContent`
+**Field**
+
+| Nama field | Tipe | Keterangan |
+|---|---|---|
+| `name` | `String` | wajib |
+| `price` | `int` | wajib, harga satuan |
+| `qty` | `int` | wajib, minimal 1 |
+
+**Getter**
+
+| Nama | Tipe | Rumus |
+|---|---|---|
+| `subtotal` | `int` | `price * qty` |
+
+**Key JSON masuk (`fromJson`)**
+
+| Key | Alias yang diterima | Tipe | Default |
+|---|---|---|---|
+| `nama` | `name` | `String` | wajib |
+| `harga` | `price` | `int` / `double` / `String` angka | wajib |
+| `qty` | `jumlah` | `int` / `double` / `String` angka | `1` |
+
+**Key JSON keluar (`toJson`)**: `nama`, `harga`, `qty`
+
+**Teks pesan error (harus persis)**
+
+| Kondisi | Teks |
+|---|---|
+| nama kosong / bukan teks | `Field "nama" wajib ada dan berupa teks` |
+| harga negatif | `Harga tidak boleh negatif` |
+| qty ≤ 0 | `Jumlah item harus minimal 1` |
+| field angka tidak ada | `Field "<nama field>" tidak ditemukan` |
+| field angka tidak valid | `Field "<nama field>" tidak valid: <value>` |
+
+---
+
+## 3. `test/fixtures/models/order.dart` — enum `OrderStatus` + class `Order`
+
+**Enum `OrderStatus`**
+
+| Nilai enum | `label` |
+|---|---|
+| `diproses` | `Diproses` |
+| `siapDiambil` | `Siap Diambil` |
+| `selesai` | `Selesai` |
+
+Fungsi: `OrderStatus.fromString(String value)` — fallback ke `diproses`.
+
+**Field `Order`**
+
+| Nama field | Tipe | Default |
+|---|---|---|
+| `id` | `String` | wajib |
+| `items` | `List<OrderItem>` | wajib |
+| `status` | `OrderStatus` | `OrderStatus.diproses` |
+| `queueLength` | `int` | `0` |
+
+**Getter `Order`**
+
+| Nama | Tipe | Rumus |
+|---|---|---|
+| `totalPrice` | `int` | Σ `item.subtotal` |
+| `totalItems` | `int` | Σ `item.qty` |
+| `isEmpty` | `bool` | `items.isEmpty` |
+
+**Key JSON masuk (`fromJson`)**
+
+| Key | Tipe | Default |
+|---|---|---|
+| `id` | `String` | `''` |
+| `items` | `List` (wajib ada) | — |
+| `status` | `String` | `Diproses` |
+| `queue_length` | `int` | `0` |
+
+**Key JSON keluar (`toJson`)**: `id`, `items`, `status`, `queue_length`
+
+**Teks pesan error (harus persis)**
+
+| Kondisi | Teks |
+|---|---|
+| `items` bukan array | `Field "items" harus berupa array` |
+| elemen bukan objek | `Setiap item harus berupa objek` |
+
+---
+
+## 4. `test/fixtures/services/notification_service.dart`
+
+**Class `NotificationContent`**
 
 | Field | Tipe |
 |---|---|
 | `title` | `String` |
 | `body` | `String` |
 
-`const NotificationContent({required String title, required String body})`,
-punya `==`, `hashCode`, dan `toString()` → `'$title | $body'`.
+**Fungsi**
 
-### `buildOrderStatusContent` (fungsi murni yang diuji)
-
-```dart
-NotificationContent buildOrderStatusContent(
-  OrderStatus status, {
-  String? orderId,
-  int? estimateMinutes,
-})
-```
-
-`final String suffix = (orderId == null || orderId.isEmpty) ? '' : ' #$orderId';`
-
-| Status | `title` | `body` |
-|---|---|---|
-| `diproses` | `'Pesanan$suffix Diproses'` | `'Pesananmu sedang dibuat oleh kantin. Mohon tunggu sebentar ya.'` |
-| `siapDiambil` | `'Pesanan$suffix Siap Diambil!'` | `'Silakan ambil pesananmu di konter kantin sebelum dingin.'` + `estimasi` |
-| `selesai` | `'Pesanan$suffix Selesai'` | `'Terima kasih sudah memesan di CerdasCanteen. Selamat makan!'` |
-
-`estimasi` = `''` bila `estimateMinutes == null`, atau
-`' Estimasi tunggu ±$estimateMinutes menit.'` (ada spasi di depan, tanda `±`).
-
-**Yang harus disesuaikan implementasi:** teks `title`/`body` di atas adalah yang
-diperiksa test (`contains('Diproses')`, `contains('±9 menit')`, dsb). Kalau desain
-notifikasi diubah, ubah test-nya juga. Perhatikan `orderId` kosong harus
-**tidak** memunculkan `#` (test: `isNot(contains('#'))`).
-
-### Kontrak `NotificationService` yang perlu dibuat Anggota 1
-
-Kelas ini **sudah ditarik dari repo** (bukan scope testing), tetapi kontraknya
-harus dipenuhi saat implementasi:
-
-| Anggota | Nilai / Signature |
+| Nama | Signature |
 |---|---|
-| `NotificationService.instance` | singleton |
-| `channelId` | `'cerdascanteen_order_status'` |
-| `channelName` | `'Status Pesanan'` |
-| `channelDescription` | `'Notifikasi perubahan status pesanan CerdasCanteen'` |
-| `bool get isInitialized` | status inisialisasi plugin |
-| `bool get permissionGranted` | hasil permintaan izin |
-| `Future<bool> init()` | idempotent, tidak boleh melempar exception |
-| `Future<bool> requestPermission()` | Android 13+ (`POST_NOTIFICATIONS`), iOS, web |
-| `Future<bool> showOrderStatus(OrderStatus status, {String? orderId, int? estimateMinutes, int? notificationId})` | memakai `buildOrderStatusContent` |
-| `Future<bool> showOrderStatusForOrder(Order order, {int? estimateMinutes})` | shortcut |
+| `buildOrderStatusContent` | `NotificationContent buildOrderStatusContent(OrderStatus status, {String? orderId, int? estimateMinutes})` |
 
-**Yang harus disesuaikan implementasi:**
+**Teks `title` (harus persis)**
 
-1. Title/body **wajib** diambil dari `buildOrderStatusContent` — jangan ditulis ulang,
-   agar teks notifikasi dan test tetap satu sumber.
-2. Izin ditolak **bukan** error: `requestPermission()` mengembalikan `false`, dan UI
-   **wajib** menampilkan penjelasan (dialog/snackbar), bukan diam saja
-   (bug ini tercatat sebagai BUG-004 di `docs/bug_log.md`).
-3. Dependency yang perlu ditambahkan kembali saat implementasi:
-   `flutter_local_notifications`. Untuk `flutter_local_notifications` ≥ v10,
-   Android **butuh** `isCoreLibraryDesugaringEnabled = true` dan
-   `coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")`
-   (BUG-005). Izin di `AndroidManifest.xml`: `POST_NOTIFICATIONS`, `VIBRATE`.
+| Status | Tanpa `orderId` | Dengan `orderId` |
+|---|---|---|
+| `diproses` | `Pesanan Diproses` | `Pesanan #<id> Diproses` |
+| `siapDiambil` | `Pesanan Siap Diambil!` | `Pesanan #<id> Siap Diambil!` |
+| `selesai` | `Pesanan Selesai` | `Pesanan #<id> Selesai` |
+
+**Teks `body` (harus persis)**
+
+| Status | Body |
+|---|---|
+| `diproses` | `Pesananmu sedang dibuat oleh kantin. Mohon tunggu sebentar ya.` |
+| `siapDiambil` | `Silakan ambil pesananmu di konter kantin sebelum dingin.` + ` Estimasi tunggu ±<N> menit.` (hanya bila `estimateMinutes` tidak null) |
+| `selesai` | `Terima kasih sudah memesan di CerdasCanteen. Selamat makan!` |
+
+**Kontrak `NotificationService` (belum ada di repo, dibutuhkan saat implementasi)**
+
+| Item | Nilai |
+|---|---|
+| `channelId` | `cerdascanteen_order_status` |
+| `channelName` | `Status Pesanan` |
+
+| Method | Signature |
+|---|---|
+| `init` | `Future<void> init()` |
+| `requestPermission` | `Future<bool> requestPermission()` |
+| `showOrderStatus` | `Future<void> showOrderStatus(OrderStatus status, {String? orderId, int? estimateMinutes, int? notificationId})` |
 
 ---
 
-## 5. `test/fixtures/utils/validators.dart` — validasi form login/register
+## 5. `test/fixtures/utils/validators.dart`
 
-Semua fungsi bersifat `static` dan **mengembalikan `String?`** (`null` = valid).
-Teks pesan di bawah **diperiksa persis** oleh test.
+**Class `Validators`** (semua `static`)
 
-### `Validators.email(String? value)`
-
-| Kondisi | Return |
+| Method | Signature |
 |---|---|
-| kosong / hanya spasi / `null` | `'Email wajib diisi'` |
-| tidak cocok regex | `'Format email tidak valid'` |
-| cocok | `null` |
+| `email` | `String? email(String? value)` |
+| `password` | `String? password(String? value)` |
+| `nama` | `String? nama(String? value)` |
+| `konfirmasiPassword` | `String? konfirmasiPassword(String? value, String password)` |
+| `isFormValid` | `bool isFormValid(List<String?> errors)` |
 
-Regex: `^[\w.+-]+@[\w-]+\.[\w.-]+$` (input di-`trim()` lebih dulu).
-Contoh valid teruji: `mahasiswa@kampus.ac.id`, `  budi.s@mail.com  `.
-Contoh ditolak: `tanpa-at`, `budi@`, `budi@kampus` (domain tanpa titik).
+**Batas nilai**
 
-### `Validators.password(String? value)`
-
-| Kondisi | Return |
+| Aturan | Nilai |
 |---|---|
-| `''` | `'Password wajib diisi'` |
-| panjang `< 8` | `'Password minimal 8 karakter'` |
-| panjang `>= 8` | `null` |
+| panjang minimal password | `8` karakter |
+| panjang minimal nama | `3` karakter |
 
-### `Validators.nama(String? value)`
+**Teks pesan error (harus persis)**
 
-| Kondisi | Return |
+| Kondisi | Teks |
 |---|---|
-| kosong / hanya spasi | `'Nama wajib diisi'` |
-| panjang `< 3` | `'Nama minimal 3 karakter'` |
-| lainnya | `null` |
+| email kosong | `Email wajib diisi` |
+| format email salah | `Format email tidak valid` |
+| password kosong | `Password wajib diisi` |
+| password < 8 | `Password minimal 8 karakter` |
+| nama kosong | `Nama wajib diisi` |
+| nama < 3 | `Nama minimal 3 karakter` |
+| konfirmasi kosong | `Konfirmasi password wajib diisi` |
+| konfirmasi beda | `Konfirmasi password tidak sama` |
 
-### `Validators.konfirmasiPassword(String? value, String password)`
+**Class `CheckoutRules`**
 
-| Kondisi | Return |
+| Method | Signature |
 |---|---|
-| kosong | `'Konfirmasi password wajib diisi'` |
-| berbeda dari `password` | `'Konfirmasi password tidak sama'` |
-| sama | `null` |
+| `validateCart` | `String? validateCart({required int itemCount})` |
+| `canCheckout` | `bool canCheckout({required int itemCount})` |
 
-### `Validators.isFormValid(List<String?> errors)`
-
-`true` bila **semua** elemen `null`.
-
-### `CheckoutRules` — penilaian proses sistem (Tugas 13)
-
-| Fungsi | Perilaku |
+| Kondisi | Teks |
 |---|---|
-| `String? validateCart({required int itemCount})` | `itemCount <= 0` → `'Keranjang kosong, tidak bisa checkout'`; selain itu `null` |
-| `bool canCheckout({required int itemCount})` | `validateCart(...) == null` |
-
-**Yang harus disesuaikan implementasi:**
-
-1. Tombol "Checkout" **wajib** memanggil `CheckoutRules.canCheckout(itemCount: ...)`
-   dan menonaktifkan/menolak aksi bila `false`. Inilah bukti "checkout dengan
-   keranjang kosong ditolak" yang dinilai pada Tugas 13.
-2. Gunakan `Validators.*` sebagai `validator:` pada `TextFormField` login/register,
-   jangan menulis ulang aturan (mis. minimal password) di widget.
-3. Kalau backend punya aturan lebih ketat (mis. password harus ada angka), perbarui
-   **test dan dokumen ini** bersamaan.
-4. Minimal password = **8**, minimal nama = **3**. Angka ini diuji.
+| `itemCount <= 0` | `Keranjang kosong, tidak bisa checkout` |
 
 ---
 
 ## 6. `test/fixtures/utils/formatters.dart`
 
-| Fungsi | Signature | Contoh teruji |
+| Nama | Signature | Contoh |
 |---|---|---|
-| `formatRupiah` | `String formatRupiah(int amount)` | `15000` → `'Rp15.000'`; `500` → `'Rp500'`; `1234567` → `'Rp1.234.567'`; `0` → `'Rp0'` |
-| `formatEstimasiMenit` | `String formatEstimasiMenit(int minutes)` | `13` → `'13 menit'`; `65` → `'1 jam 5 menit'`; `120` → `'2 jam'` |
-
-Detail: `formatRupiah` memakai titik sebagai pemisah ribuan dan awalan `Rp` **tanpa spasi**;
-nilai negatif diberi tanda `-` sebelum `Rp`.
-`formatEstimasiMenit` memakai `'N menit'` bila `< 60`, `'X jam N menit'` bila ada sisa,
-dan `'X jam'` bila sisa `0`.
-
-**Yang harus disesuaikan implementasi:** semua tampilan harga memakai `formatRupiah`,
-semua tampilan estimasi memakai `formatEstimasiMenit`. Kalau memakai
-`intl`/`NumberFormat.currency`, hasilnya harus tetap sama persis (`Rp15.000`), atau
-test formatter diperbarui.
+| `formatRupiah` | `String formatRupiah(int amount)` | `15000` → `Rp15.000` |
+| `formatEstimasiMenit` | `String formatEstimasiMenit(int minutes)` | `13` → `13 menit`<br>`65` → `1 jam 5 menit`<br>`120` → `2 jam` |
 
 ---
 
-## 7. `test/fixtures/services/device_service.dart` — fitur native info perangkat
+## 7. `test/fixtures/services/device_service.dart`
 
-### `DeviceInfoEntry`
+**Class `DeviceInfoEntry`**
 
-`const DeviceInfoEntry(String label, String value)`; punya `==`, `hashCode`,
-`toString()` → `'$label: $value'`.
-
-### `DeviceSummary`
-
-| Anggota | Keterangan |
+| Field | Tipe |
 |---|---|
-| `const DeviceSummary(List<DeviceInfoEntry> entries)` | — |
-| `bool get isEmpty` | `entries.isEmpty` |
-| `List<DeviceInfoEntry> get displayed` | hanya entri yang `value.trim().isNotEmpty` |
+| `label` | `String` |
+| `value` | `String` |
 
-### `DeviceSummary.fromRaw({...})` — parameter & label yang dihasilkan
+Constructor: `DeviceInfoEntry(String label, String value)`
 
-| Parameter | Tipe | Label entri yang muncul |
-|---|---|---|
-| `manufacturer` + `model` | `String?` | `'Perangkat'` → `'<manufacturer> <model>'` (bagian kosong dilewati) |
-| `brand` | `String?` | `'Merek'` |
-| `device` | `String?` | `'Nama internal'` |
-| `androidVersion` (+ `sdkInt`) | `String?`, `int?` | `'Versi Android'` → `'Android 13 (API 33)'`; bila `androidVersion` kosong tetapi `sdkInt` ada → `'API Level'` → `'33'` |
-| `iosName` | `String?` | `'Perangkat iOS'` |
-| `iosModel` | `String?` | `'Model iOS'` |
-| `iosSystemVersion` | `String?` | `'Versi iOS'` |
-| `webBrowserName` | `String?` | `'Browser'` |
-| `webPlatform` | `String?` | `'Platform Web'` |
-| `fcmToken` | `String?` | `'Token notifikasi'` (dipotong) |
-| `now` | `DateTime?` | `'Login terakhir'` → format `dd/MM/yyyy HH:mm` (default `DateTime.now()`) |
+**Class `DeviceSummary`**
 
-**Aturan detail yang diuji:**
-
-- Entri dengan nilai kosong/spasi **tidak dibuat** (test: "data kosong tidak
-  menghasilkan entri kosong").
-- `'Login terakhir'` **selalu** ada, format `05/01/2026 09:07` (dua digit, leading zero).
-- Token: panjang ≤ 16 ditampilkan utuh; lebih dari itu → `8 karakter pertama` +
-  `…` + `6 karakter terakhir` (test: total `< 27` karakter dan mengandung `'…'`).
-
-**Yang harus disesuaikan implementasi:**
-
-1. Nama label (`'Perangkat'`, `'Versi Android'`, `'Login terakhir'`, …) dipakai test
-   widget. Kalau UI ingin label lain, ubah test sekaligus.
-2. Saat plugin gagal, **wajib** memakai fallback `DeviceSummary.fromRaw(model: 'Tidak diketahui')`
-   (test: teks `'Tidak diketahui'` muncul, dan **tidak** ada teks `'Gagal membaca'`).
-3. Dependency: `device_info_plus` (ditarik dari repo saat ini, tambahkan kembali saat
-   implementasi). Tidak butuh izin runtime.
-
-### Kontrak `DeviceService` (injection untuk test)
-
-| Anggota | Signature |
+| Field / getter | Tipe |
 |---|---|
-| typedef | `typedef DeviceSummaryLoader = Future<DeviceSummary> Function();` |
-| konstruktor | `DeviceService({DeviceInfoPlugin? plugin, DeviceSummaryLoader? loader})` |
-| singleton | `static final DeviceService instance` |
-| utama | `Future<DeviceSummary> load({bool forceRefresh = false})` |
-| tambahan | `void clearCache()` |
+| `entries` | `List<DeviceInfoEntry>` |
+| `isEmpty` | `bool` |
+| `displayed` | `List<DeviceInfoEntry>` |
 
-**Penting (BUG-007):** jalur `loader` **wajib** dipertahankan. Di `flutter test`,
-plugin native tidak menjawab sehingga `Future` tidak pernah selesai dan widget test
-mengalami `pumpAndSettle timed out`. Test memakai `DeviceService(loader: ...)`.
-`load()` juga wajib membungkus pemanggilan plugin dengan `try/catch`.
-
----
-
-## 8. Variabel khusus test (tidak perlu diubah implementasi)
-
-Nilai berikut hanya hidup di dalam file test, dicatat agar tidak dikira bagian sistem.
-
-| File | Variabel | Nilai |
-|---|---|---|
-| `test/form_widget_test.dart` | `_emailKey` | `Key('email-field')` |
-| `test/form_widget_test.dart` | `_submitKey` | `Key('submit-button')` |
-| `test/form_widget_test.dart` | `_submittedValue` | penanda `'terkirim'` |
-| `test/queue_estimator_test.dart` | data uji | `(0,1)→2`, `(3,2)→13`, `(-1,1)`, `(1,-1)`, `(2,0)` |
-| `test/order_total_test.dart` | `id` contoh | `CC-1`, `CC-2`, `CC-3` |
-| `test/json_parsing_test.dart` | `id` contoh | `CC-100`, `CC-101`, `CC-7` |
-| `test/services_test.dart` | data perangkat | `samsung`/`SM-A525F`/API 33; `DateTime(2026,1,5,9,7)` |
-
-`test/form_widget_test.dart` sengaja merakit `Form` + `TextFormField` sendiri
-(tidak mengimpor `lib/screens/**`), sehingga tetap jalan di FlutLab walau layar
-login/register belum dibuat.
-
----
-
-## 9. Ringkasan: yang wajib ditambahkan kembali saat implementasi sistem
-
-Saat ini repo **hanya berisi kode yang diuji + test** (sesuai instruksi: "hanya
-membuat testing"). Yang sudah ditarik dan perlu dibuat ulang oleh tim:
-
-| Item | Status | Catatan |
-|---|---|---|
-| `lib/screens/qr_receipt_screen.dart` | ditarik | kontrak widget test ada di `docs/rencana_test/qr_receipt_screen_test.dart.pending` |
-| `lib/screens/profile_screen.dart` | ditarik | kontrak ada di `docs/rencana_test/profile_screen_test.dart.pending` |
-| `lib/main_anggota3_demo.dart` | ditarik | entry point demo |
-| `NotificationService` (kelas plugin) | ditarik | kontrak di bagian 4 |
-| `DeviceService` (kelas plugin) | ditarik | kontrak di bagian 7 |
-| dependency `device_info_plus`, `flutter_local_notifications`, `qr_flutter` | ditarik dari `pubspec.yaml` | tambahkan kembali saat memakai |
-| konfigurasi Android (desugaring, `POST_NOTIFICATIONS`) | dikembalikan ke asli | lihat BUG-005 |
-
-Dua file `*.pending` di `docs/rencana_test/` **bukan** test aktif (tidak dijalankan
-`flutter test` karena berekstensi `.pending`). Setelah layar dibuat, pindahkan ke
-`test/` dan hapus akhiran `.pending`.
-
-### Kontrak layar yang harus dipenuhi agar widget test tadi bisa diaktifkan
-
-| Layar | Kontrak minimum |
+| Method | Signature |
 |---|---|
-| `QrReceiptScreen` | konstruktor `QrReceiptScreen({required Order order, int? estimateMinutes})`; getter `int get resolvedEstimate` (fallback `0` bila `ArgumentError`); getter `String get qrData` berisi `CERDASCANTEEN`, `ID:<id>`, `ITEM:<totalItems>`, `TOTAL:<totalPrice>`, `EST:<estimasi>`, `STATUS:<label uppercase>`; memakai `QrImageView` (`qr_flutter`) |
-| `ProfileScreen` | konstruktor `ProfileScreen({String studentName, String studentId, DeviceService? deviceService, ...})`; menampilkan `'Informasi Perangkat'`, `'Notifikasi Pesanan'`, dan tombol `'Coba Notifikasi "Siap Diambil"'`; menerima `DeviceService` untuk injeksi |
+| `DeviceSummary.fromRaw` | `factory DeviceSummary.fromRaw({String? manufacturer, String? model, String? brand, String? device, String? androidVersion, int? sdkInt, String? iosName, String? iosSystemVersion, String? iosModel, String? webBrowserName, String? webPlatform, String? fcmToken, DateTime? now})` |
+
+**Label yang dihasilkan `fromRaw`**
+
+| Parameter | Label entri |
+|---|---|
+| `manufacturer` + `model` | `Perangkat` |
+| `brand` | `Merek` |
+| `device` | `Nama internal` |
+| `androidVersion` (+ `sdkInt`) | `Versi Android` (contoh `Android 13 (API 33)`) |
+| `sdkInt` saja | `API Level` |
+| `iosName` | `Perangkat iOS` |
+| `iosModel` | `Model iOS` |
+| `iosSystemVersion` | `Versi iOS` |
+| `webBrowserName` | `Browser` |
+| `webPlatform` | `Platform Web` |
+| `fcmToken` | `Token notifikasi` |
+| `now` (atau `DateTime.now()`) | `Login terakhir` |
+
+**Aturan pemotongan `fcmToken`**: panjang ≤ 16 → utuh; lebih dari 16 →
+`8 karakter awal` + `…` + `6 karakter akhir`
+
+**Format `Login terakhir`**: `dd/MM/yyyy HH:mm`
+
+**Nilai fallback** saat data gagal dibaca: `Tidak diketahui`
+
+| Item | Nilai |
+|---|---|
+| tipe injeksi test | `typedef DeviceSummaryLoader = Future<DeviceSummary> Function();` |
+| constructor | `DeviceService({DeviceInfoPlugin? plugin, DeviceSummaryLoader? loader})` |
+| method | `Future<DeviceSummary> load({bool forceRefresh = false})` |
+| method | `void clearCache()` |
 
 ---
 
-## 10. Cara memverifikasi setelah implementasi
+## 8. Variabel khusus test (tidak perlu diubah developer)
 
-```bash
-flutter pub get
-flutter test                      # harus "All tests passed!"
-flutter analyze                   # harus "No issues found!"
-```
+| Nama | Nilai | Dipakai di |
+|---|---|---|
+| `_emailKey` | `Key('email-field')` | `form_widget_test.dart` |
+| `_submitKey` | `Key('submit-button')` | `form_widget_test.dart` |
+| penanda submit | `terkirim` | `form_widget_test.dart` |
 
-Setelah layar dibuat, aktifkan kembali widget test yang diparkir:
+---
 
-```powershell
-Move-Item docs/rencana_test/qr_receipt_screen_test.dart.pending test/qr_receipt_screen_test.dart
-Move-Item docs/rencana_test/profile_screen_test.dart.pending test/profile_screen_test.dart
-flutter test
-```
+## 9. Fitur yang belum ada kodenya (perlu dibuat developer)
 
-Kalau ada test merah setelah integrasi, penyebab tersering adalah **nama field,
-label status, atau teks pesan yang berbeda** dari tabel di dokumen ini — bukan
-kesalahan pada data uji.
+| Path yang dibutuhkan | Isi minimum |
+|---|---|
+| `lib/screens/qr_receipt_screen.dart` | getter `resolvedEstimate` (int), getter `qrData` (String) berisi baris `CERDASCANTEEN`, `ID:`, `ITEM:`, `TOTAL:`, `EST:`, `STATUS:` |
+| `lib/screens/profile_screen.dart` | menampilkan `DeviceSummary.entries`, tombol notifikasi |
+| `lib/notifikasi` (class `NotificationService`) | sesuai kontrak bagian 4 |
+| `lib/services/device_service.dart` (jalur plugin) | `load()` + `clearCache()`, wajib bisa diinjeksi `DeviceSummaryLoader` |
+
+Widget test untuk kedua layar diparkir di `docs/rencana_test/*.pending`.
+
+---
+
+## 10. Cara memakai daftar ini saat integrasi
+
+1. Implementasikan fitur di `lib/` (atau path yang disepakati tim).
+2. Ubah import di file test dari `fixtures/...` menjadi
+   `package:tubes_perak/...` sesuai lokasi baru.
+3. **Jangan ubah** nama field, nama fungsi, signature, dan teks pesan pada
+   dokumen ini — test menguncinya.
+4. Jalankan `flutter test`. Bila ada yang merah, baca `reason:` pada output
+   (panduan lengkap: `docs/panduan_testing.md`).
