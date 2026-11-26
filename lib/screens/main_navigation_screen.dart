@@ -1,12 +1,15 @@
+// lib/screens/main_navigation_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/canteen_item.dart';
+
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import '../routes/app_routes.dart';
 import '../services/auth_service.dart';
+import '../theme/theme_provider.dart';
 import 'cart_screen.dart';
-import 'menu_detail_screen.dart';
+import 'history_screen.dart';
+import 'home_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -18,6 +21,9 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
+  // Counter agar tab Riwayat otomatis memuat ulang data SQLite terbaru setiap dibuka
+  int _historyRefreshTick = 0;
+
   static const _titles = [
     'Menu CerdasCanteen',
     'Keranjang Pesanan',
@@ -25,36 +31,61 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     'Profil Mahasiswa',
   ];
 
+  void _pilihTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+      if (index == 2) {
+        _historyRefreshTick++;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final pages = const [
-      _MenuTab(),
-      CartScreen(showAppBar: false),
-      _HistoryTab(),
-      _ProfileTab(),
+    final pages = [
+      // Tab 0 (Integrasi Anggota 2): HomeScreen dengan API TheMealDB, search & filter
+      const HomeScreen(showNavigationActions: false),
+      // Tab 1 (Anggota 1): Keranjang pesanan
+      const CartScreen(showAppBar: false),
+      // Tab 2 (Integrasi Anggota 2): Riwayat transaksi SQLite
+      HistoryScreen(
+        key: ValueKey('history-$_historyRefreshTick'),
+        showAppBar: false,
+      ),
+      // Tab 3 (Anggota 1 + pintasan Pengaturan Anggota 2): Profil & Logout
+      const _ProfileTab(),
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_titles[_selectedIndex]),
-        actions: [
-          if (_selectedIndex != 1)
-            Selector<CartProvider, int>(
-              selector: (_, cart) => cart.totalItemCount,
-              builder: (context, count, _) {
-                return IconButton(
-                  tooltip: 'Buka Keranjang',
-                  onPressed: () => setState(() => _selectedIndex = 1),
-                  icon: Badge(
-                    isLabelVisible: count > 0,
-                    label: Text('$count'),
-                    child: const Icon(Icons.shopping_cart_outlined),
+      // Tab 0 (HomeScreen) sudah memiliki AppBar & header pencarian sendiri agar tidak dobel
+      appBar: _selectedIndex == 0
+          ? null
+          : AppBar(
+              title: Text(_titles[_selectedIndex]),
+              actions: [
+                if (_selectedIndex != 1)
+                  Selector<CartProvider, int>(
+                    selector: (_, cart) => cart.totalItemCount,
+                    builder: (context, count, _) {
+                      return IconButton(
+                        tooltip: 'Buka Keranjang',
+                        onPressed: () => _pilihTab(1),
+                        icon: Badge(
+                          isLabelVisible: count > 0,
+                          label: Text('$count'),
+                          child: const Icon(Icons.shopping_cart_outlined),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                IconButton(
+                  tooltip: 'Pengaturan',
+                  onPressed: () =>
+                      Navigator.pushNamed(context, AppRoutes.settings),
+                  icon: const Icon(Icons.settings_outlined),
+                ),
+              ],
             ),
-        ],
-      ),
       body: IndexedStack(
         index: _selectedIndex,
         children: pages,
@@ -62,7 +93,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
-        onTap: (index) => setState(() => _selectedIndex = index),
+        onTap: _pilihTab,
         items: [
           const BottomNavigationBarItem(
             icon: Icon(Icons.restaurant_menu),
@@ -71,7 +102,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           BottomNavigationBarItem(
             icon: Selector<CartProvider, int>(
               selector: (_, cart) => cart.totalItemCount,
-              builder: (_, count, __) => Badge(
+              builder: (context, count, child) => Badge(
                 isLabelVisible: count > 0,
                 label: Text('$count'),
                 child: const Icon(Icons.shopping_cart_outlined),
@@ -93,160 +124,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 }
 
-/// Tab 0: Daftar Menu (TODO Integrasi Anggota 2: ganti dengan HomeScreen API)
-class _MenuTab extends StatelessWidget {
-  const _MenuTab();
-
-  static const List<CanteenMenu> _sampleMenus = [
-    CanteenMenu(
-      id: 'MK01',
-      nama: 'Nasi Ayam Geprek',
-      harga: 15000,
-      kategori: 'Makanan Berat',
-      deskripsi: 'Ayam crispy digeprek sambal bawang hangat + nasi putih.',
-      gambarUrl: '',
-      estimasiMenit: 6,
-    ),
-    CanteenMenu(
-      id: 'MK02',
-      nama: 'Mie Goreng Kantin Spesial',
-      harga: 12000,
-      kategori: 'Makanan Berat',
-      deskripsi: 'Mie goreng telur ceplok, sawi segar, dan kerupuk renyah.',
-      gambarUrl: '',
-      estimasiMenit: 5,
-    ),
-    CanteenMenu(
-      id: 'MN01',
-      nama: 'Es Teh Tarik Kampus',
-      harga: 6000,
-      kategori: 'Minuman',
-      deskripsi: 'Teh tarik dingin manis pas untuk menemani jam istirahat.',
-      gambarUrl: '',
-      estimasiMenit: 2,
-    ),
-    CanteenMenu(
-      id: 'SN01',
-      nama: 'Risoles Mayo (Isi 3)',
-      harga: 8000,
-      kategori: 'Snack',
-      deskripsi: 'Risoles hangat isi smoked beef, telur, dan saus mayones.',
-      gambarUrl: '',
-      estimasiMenit: 3,
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: _sampleMenus.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemBuilder: (context, index) {
-        final menu = _sampleMenus[index];
-        return Card(
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(12),
-            leading: CircleAvatar(
-              backgroundColor: colorScheme.primaryContainer,
-              child: Icon(
-                menu.kategori == 'Minuman' ? Icons.local_cafe : Icons.fastfood,
-                color: colorScheme.primary,
-              ),
-            ),
-            title: Text(
-              menu.nama,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              '${menu.kategori} • ${formatRupiah(menu.harga)} • ~${menu.estimasiMenit} mnt',
-            ),
-            trailing: IconButton.filledTonal(
-              tooltip: 'Tambah cepat ke keranjang',
-              icon: const Icon(Icons.add_shopping_cart),
-              onPressed: () {
-                context.read<CartProvider>().addItem(menu);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${menu.nama} ditambahkan ke keranjang'),
-                    duration: const Duration(seconds: 1),
-                  ),
-                );
-              },
-            ),
-            // Navigator.push dengan pengantaran data objek menu (Tugas 5)
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => MenuDetailScreen(menu: menu),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// Tab 2: Riwayat Pesanan (TODO Integrasi Anggota 2: sambungkan ke SQLite)
-class _HistoryTab extends StatelessWidget {
-  const _HistoryTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<CartProvider>(
-      builder: (context, cart, _) {
-        if (cart.recentOrders.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.receipt_long_outlined, size: 64, color: Colors.grey),
-                SizedBox(height: 12),
-                Text('Belum ada riwayat pesanan'),
-              ],
-            ),
-          );
-        }
-
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: cart.recentOrders.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final order = cart.recentOrders[index];
-            return Card(
-              child: ListTile(
-                leading: const CircleAvatar(
-                  child: Icon(Icons.receipt_long),
-                ),
-                title: Text(
-                  '${order.kodePesanan} • ${formatRupiah(order.totalHarga)}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  '${order.totalItem} item • ${order.metodeBayar}',
-                ),
-                trailing: Chip(label: Text(order.status)),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-/// Tab 3: Profil & Logout (Tugas 11 + TODO Integrasi Anggota 3: Kamera/Notif)
+/// Tab 3: Profil & Logout (Anggota 1) + Pintasan Pengaturan & Mode Gelap (Anggota 2)
 class _ProfileTab extends StatelessWidget {
   const _ProfileTab();
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
         final user = auth.currentUser;
@@ -285,6 +170,30 @@ class _ProfileTab extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              // Pintasan ke SettingsScreen (Mode Gelap, Notifikasi, Nama Panggilan)
+              Card(
+                child: ListTile(
+                  leading: Icon(
+                    themeProvider.isDarkMode
+                        ? Icons.dark_mode_rounded
+                        : Icons.tune_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text(
+                    'Pengaturan & Mode Gelap',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Text(
+                    themeProvider.isDarkMode
+                        ? 'Tema Gelap aktif • Ketuk untuk atur preferensi'
+                        : 'Tema Terang aktif • Ketuk untuk atur preferensi',
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.settings),
                 ),
               ),
               const Spacer(),

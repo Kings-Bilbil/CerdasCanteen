@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/canteen_item.dart';
+import '../models/transaksi.dart';
+import '../screens/history_screen.dart';
+import '../services/db_helper.dart';
 
 class CartProvider extends ChangeNotifier {
   final List<CartItem> _items = [];
@@ -127,6 +130,8 @@ class CartProvider extends ChangeNotifier {
 
       final now = DateTime.now();
       final kode = 'CC-${now.millisecondsSinceEpoch.toString().substring(7)}';
+      final ringkasanItem =
+          _items.map((e) => '${e.qty}x ${e.menu.nama}').join(', ');
       final order = OrderRecord(
         kodePesanan: kode,
         namaPemesan: namaPemesan,
@@ -136,6 +141,21 @@ class CartProvider extends ChangeNotifier {
         status: 'Diproses',
         waktuPesan: now,
       );
+
+      // Integrasi Anggota 2 (Tugas 10): simpan transaksi ke SQLite (Android/iOS)
+      // atau cache preview sementara saat dijalankan di Flutter Web (FlutLab)
+      final transaksi = Transaksi(
+        kodePesanan: order.kodePesanan,
+        ringkasanItem: ringkasanItem,
+        total: order.totalHarga.toDouble(),
+        status: order.status,
+        waktu: order.waktuPesan,
+      );
+      if (kIsWeb) {
+        HistoryScreen.tambahPreviewWeb(transaksi);
+      } else {
+        await DbHelper.instance.insertTransaksi(transaksi);
+      }
 
       _recentOrders.insert(0, order);
       _items.clear();
