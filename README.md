@@ -1,5 +1,7 @@
 ﻿# CerdasCanteen
 
+[![Download APK](https://img.shields.io/badge/Download-Android%20APK%20v1.0.0-007F5F?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kings-Bilbil/CerdasCanteen/releases/download/1.0.0/uas_perak.apk) [![Tonton Video Demo](https://img.shields.io/badge/YouTube-Tonton%20Video%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/3cKO_6iX33g) [![Figma UI Design](https://img.shields.io/badge/Figma-UI%20Design%20%26%20ERD-55A630?style=for-the-badge&logo=figma&logoColor=white)](https://www.figma.com/design/wauJbVqA5AZxOpl2voKQMK)
+
 > Aplikasi pemesanan makanan kantin kampus berbasis Flutter.
 
 CerdasCanteen membantu mahasiswa melihat menu, memesan makanan tanpa antre panjang, memantau pesanan, dan melihat riwayat transaksi. Proyek ini dibuat untuk UAS Pengembangan Aplikasi Perangkat Bergerak (A), Sistem Informasi, FMIPA Universitas Tanjungpura, Semester Ganjil 2026/2027.
@@ -26,7 +28,25 @@ CerdasCanteen membantu mahasiswa melihat menu, memesan makanan tanpa antre panja
 
 ## Teknologi
 
-Flutter, Dart, Provider, `http`, `sqflite`, `path`, `shared_preferences`, `intl`, dan `flutter_test`.
+Flutter, Dart, Provider, `http`, `google_fonts`, `sqflite`, `path`, `shared_preferences`, `intl`, dan `flutter_test`.
+
+## Download Aplikasi (Android APK)
+
+- **Tautan Langsung:** [Download CerdasCanteen v1.0.0 — Android ARM64 (.apk)](https://github.com/Kings-Bilbil/CerdasCanteen/releases/download/1.0.0/uas_perak.apk)
+- **Cara Instal di HP Android:** Unduh file `.apk` → buka file → izinkan *Install from unknown sources* jika diminta → login memakai akun demo (`mahasiswa@untan.ac.id` / `123456`) atau daftar akun baru.
+
+## Video Demo Aplikasi
+
+[![Thumbnail Video Demo CerdasCanteen](https://img.youtube.com/vi/3cKO_6iX33g/hqdefault.jpg)](https://youtu.be/3cKO_6iX33g)
+
+- **Link YouTube:** [https://youtu.be/3cKO_6iX33g](https://youtu.be/3cKO_6iX33g)
+
+## Dokumentasi Desain & Basis Data
+
+- **ERD & Skema Basis Data (Mermaid + DDL MySQL & SQLite):** [`docs/erd_database.md`](docs/erd_database.md)
+- **Diagram ERD Interaktif (FigJam):** [CerdasCanteen — ERD Database](https://www.figma.com/board/gQ6nS3nAlDTwZWwy1rjSyG)
+- **Wireframe & UI Design (Figma):** [CerdasCanteen — UI Design (7 Layar + Dark Mode)](https://www.figma.com/design/wauJbVqA5AZxOpl2voKQMK)
+- **Slide Presentasi UAS (Figma Slides):** [CerdasCanteen — Presentasi 5 Menit](https://www.figma.com/slides/dD1vu8tcvt7XDZ5tudHXKH)
 
 ## Menjalankan di FlutLab.io
 
@@ -138,7 +158,9 @@ lib/
   utils/                 Modul estimasi antrean
   widgets/               Widget reusable
 test/                    Unit test dan widget test
-docs/tdd/                Log bukti proses TDD
+docs/
+  erd_database.md        ERD Mermaid, DDL MySQL & SQLite, & aset Figma
+  tdd/                   Log bukti proses TDD
 ```
 
 ## Backend Opsional
@@ -168,12 +190,5 @@ SQLite berjalan pada Android, iOS, dan macOS. Pada Web Preview FlutLab, aplikasi
 - Branch gabungan: `master`
 
 ## Lisensi
-
-## Download Aplikasi (Android APK)
-
-[![Download APK](https://img.shields.io/badge/Download-Android%20APK%20(ARM64)-007F5F?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kings-Bilbil/CerdasCanteen/releases/download/1.0.0/uas_perak.apk)
-
-- **Tautan Langsung:** [Download CerdasCanteen v1.0.0 — Android ARM64 (.apk)](https://github.com/Kings-Bilbil/CerdasCanteen/releases/download/1.0.0/uas_perak.apk)
-- **Cara Instal di HP Android:** Unduh file `.apk` → buka file → izinkan *Install from unknown sources* jika diminta → login memakai akun demo (`mahasiswa@untan.ac.id` / `123456`) atau daftar akun baru.
 
 Project ini dibuat untuk keperluan pembelajaran dan penilaian UAS.
