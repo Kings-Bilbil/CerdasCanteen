@@ -73,3 +73,10 @@ Antrian kantin kampus sangat panjang saat jam istirahat sehingga mahasiswa kehil
 
 ---
 
+## Download Aplikasi (Android APK)
+
+[![Download APK](https://img.shields.io/badge/Download-Android%20APK%20(ARM64)-007F5F?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kings-Bilbil/CerdasCanteen/releases/download/1.0.0/uas_perak.apk)
+
+- **Tautan Langsung:** [Download CerdasCanteen v1.0.0 — Android ARM64 (.apk)](https://github.com/Kings-Bilbil/CerdasCanteen/releases/download/1.0.0/uas_perak.apk)
+- **Cara Instal di HP Android:** Unduh file `.apk` → buka file → izinkan *Install from unknown sources* jika diminta → login memakai akun demo (`mahasiswa@untan.ac.id` / `123456`) atau daftar akun baru.
+
